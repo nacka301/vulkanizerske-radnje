@@ -293,6 +293,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["sms_kind"]
           provider_message_id: string | null
           scheduled_at: string
+          sending_at: string | null
           sent_at: string | null
           status: Database["public"]["Enums"]["sms_status"]
           to_phone: string
@@ -307,6 +308,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["sms_kind"]
           provider_message_id?: string | null
           scheduled_at?: string
+          sending_at?: string | null
           sent_at?: string | null
           status?: Database["public"]["Enums"]["sms_status"]
           to_phone: string
@@ -321,6 +323,7 @@ export type Database = {
           kind?: Database["public"]["Enums"]["sms_kind"]
           provider_message_id?: string | null
           scheduled_at?: string
+          sending_at?: string | null
           sent_at?: string | null
           status?: Database["public"]["Enums"]["sms_status"]
           to_phone?: string

@@ -127,6 +127,44 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   funkcijama iz Faze 1. Rucna provjera u pregledniku (scenarij 1 iz
   poglavlja 9) ostaje za korisnika.
 
+## Faza 3
+
+- **sms-worker konfiguracija ide preko `app_settings`, ne preko Deno secreta**:
+  Supabase MCP nema alat za `supabase secrets set` (postavljanje Edge
+  Function environment varijabli). Umjesto WORKER_SECRET/SMS_PROVIDER/
+  SMS_SENDER_ID/TWILIO_* kao Deno.env varijabli, worker ih cita iz
+  `app_settings` tablice preko service-role klijenta (koji svaka Edge
+  Function automatski dobiva kao SUPABASE_SERVICE_ROLE_KEY). `pg_cron`
+  cron posao isto cita `worker_secret`/`sms_worker_url` iz `app_settings`
+  prije `net.http_post` poziva — jedan izvor istine, bez duplikacije tajne.
+  Za pravu CLI instalaciju s `supabase secrets set` ovo bi se moglo
+  zamijeniti s Deno.env citanjem bez izmjene ostatka workera; `.env.example`
+  ostaje kao referenca/dokumentacija.
+- **`sms_outbox.sending_at` kolona** (nije u originalnoj shemi iz poglavlja
+  4): nuzna da worker zna koliko dugo je redak u SENDING statusu i moze ga
+  vratiti u PENDING nakon 5 min (poglavlje 6, tocka 4 workera).
+- **`claim_pending_sms(limit)` i `recover_stuck_sms()` SQL funkcije**:
+  `SELECT ... FOR UPDATE SKIP LOCKED` ne postoji kao PostgREST/RPC
+  primitiva preko obicnog `.from().select()` poziva, pa je atomsko
+  "zauzimanje" redaka izdvojeno u SQL funkciju koju worker poziva preko RPC-a.
+- **Edge Function deployana s `verify_jwt: false`**: sms-worker ima vlastitu
+  autentifikaciju (x-worker-secret, konstantno-vremenska usporedba) jer ga
+  poziva pg_cron/pg_net (bez korisnicke JWT sesije), ne krajnji korisnik —
+  standardni Supabase JWT verify bi blokirao takve pozive.
+- **`app_settings.sms_worker_url` hardkodiran na cloud projekt**
+  (`https://xwobgzzplievhlphjuox.supabase.co/functions/v1/sms-worker`): za
+  lokalni Docker stack treba rucno azurirati na
+  `http://127.0.0.1:54321/functions/v1/sms-worker` (ili odgovarajuci port
+  iz `supabase/config.toml`) nakon `supabase start`.
+- **End-to-end provjera workera**: rucno testirano preko `execute_sql`
+  (kreirana rezervacija s telefonom -> CONFIRMATION red u `sms_outbox`) i
+  izravnog `curl` poziva na deployanu funkciju: (1) uspjesno slanje ->
+  `SENT` + `provider_message_id`; (2) pogresna tajna -> `401`; (3) namjerno
+  neispravne Twilio "kredencijale" (privremeno u `app_settings`, ocisceno
+  nakon testa) da se dokaze retry/backoff (`attempts` 1->2->3,
+  `scheduled_at` pomaknut, na kraju `FAILED`). Svi scenariji prolaze — vidi
+  git log poruku Faze 3.
+
 - **Test konkurentnosti/RLS bez service_role kljuca**: u ovoj sesiji
   Supabase MCP namjerno ne izlaze `service_role` kljuc (sigurnosno
   ogranicenje alata), pa `scripts/concurrency-test.ts`/`scripts/rls-test.ts`

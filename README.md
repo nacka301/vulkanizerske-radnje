@@ -83,6 +83,20 @@ pregledavanje `/r/demo` nije pokrenuto u ovoj sesiji (nedostajao je
    "Otkazano".
 4. `/privatnost` se ucitava.
 
+### SMS worker (Faza 3)
+
+`supabase/functions/sms-worker` je deployan na cloud projekt preko Supabase
+MCP-a (`verify_jwt: false` — vlastita autentifikacija preko `x-worker-secret`,
+usporedjenog u konstantnom vremenu s `app_settings.worker_secret`).
+`pg_cron` ga poziva svake minute preko `pg_net.http_post` (migracija
+`20260921110100_sms_worker_cron.sql`). Provjereno end-to-end preko `curl`-a:
+uspjesno slanje (`SENT` + `provider_message_id`), pogresna tajna (`401`), i
+retry/backoff do `FAILED` nakon 3 pokusaja (namjerno neispravni Twilio
+podaci, ocisceno nakon testa) — vidi DECISIONS.md.
+
+Provjera SMS logova (ConsoleSmsProvider ispisuje u Edge Function log):
+Supabase dashboard -> Edge Functions -> sms-worker -> Logs.
+
 ## Faze razvoja
 
 Vidi `claude-code-prompt.md` poglavlje 10. Status faza:
@@ -90,7 +104,7 @@ Vidi `claude-code-prompt.md` poglavlje 10. Status faza:
 - [x] Faza 0 — temelj
 - [x] Faza 1 — jezgra (baza, SQL funkcije, konkurentnost)
 - [x] Faza 2 — klijentski tok rezervacije
-- [ ] Faza 3 — SMS
+- [x] Faza 3 — SMS
 - [ ] Faza 4 — dashboard radionice
 - [ ] Faza 5 — super admin
 - [ ] Faza 6 — završna provjera
