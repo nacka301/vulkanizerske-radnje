@@ -95,6 +95,38 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   "Extension in Public" za `pg_net`, ali `ALTER EXTENSION pg_net SET SCHEMA`
   nije podrzan (pg_net-ove funkcije zive u fiksnoj shemi `net` bez obzira na
   to gdje je extension registriran) — upozorenje se svjesno ignorira.
+## Faza 2
+
+- **Turnstile se provjerava samo prije `create_booking`, ne i prije `create_hold`**:
+  poglavlje 8 doslovno trazi verifikaciju "prije create_hold i
+  create_booking", ali Cloudflare Turnstile tokeni su jednokratni (jednom
+  iskoristeni vise ne prolaze siteverify), a poglavlje 7 captchu prikazuje
+  tek u koraku 3 ("Podaci"), nakon sto je hold vec kreiran u koraku 2 klikom
+  na termin. Dvije odvojene captche (jedna za hold, jedna za booking) nisu
+  specificirane i losije su UX. Zato se captcha provjerava samo prije
+  `create_booking` (jedina akcija koja trajno upisuje podatke i salje SMS);
+  `create_hold` je zasticen IP rate limitom (5/min, poglavlje 7), sto je
+  dovoljna obrana za privremeni 3-min hold koji sam istice.
+- **`TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY` prazni u razvoju**: prema
+  uputi da se ne izmisljaju API kljucevi, `TurnstileWidget` (klijent) prikazuje
+  razvojni mock koji odmah "prolazi" kad `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+  nije postavljen, a `verifyTurnstile` (server) preskace stvarni poziv na
+  Cloudflare kad `TURNSTILE_SECRET_KEY` nije postavljen. Kad se pravi
+  kljucevi dodaju u `.env.local`, oboje automatski prelazi na stvarnu
+  verifikaciju bez izmjene koda.
+- **`check_rate_limit` fail-open**: ako sam RPC poziv za rate limit
+  neocekivano padne (npr. mrezni problem), zahtjev se ipak propusta umjesto
+  blokira — rate limit je zastita od zlouporabe, ne sigurnosna granica (to
+  su RLS + SECURITY DEFINER funkcije), pa je dostupnost vazenija od stroge
+  primjene limita u rijetkom slucaju infrastrukturnog kvara.
+- **Browser testiranje Faze 2**: u ovoj sesiji nije bilo moguce pokrenuti
+  `pnpm dev` i rucno testirati tok u pregledniku jer `SUPABASE_SERVICE_ROLE_KEY`
+  nije bio dostupan (MCP ga ne izlaze, korisnik je odabrao da to sam
+  testira). Ispravnost je provjerena preko `pnpm build`/`tsc`/`lint`/`vitest`
+  (svi prolaze bez upozorenja) i izravnih `execute_sql` poziva nad SQL
+  funkcijama iz Faze 1. Rucna provjera u pregledniku (scenarij 1 iz
+  poglavlja 9) ostaje za korisnika.
+
 - **Test konkurentnosti/RLS bez service_role kljuca**: u ovoj sesiji
   Supabase MCP namjerno ne izlaze `service_role` kljuc (sigurnosno
   ogranicenje alata), pa `scripts/concurrency-test.ts`/`scripts/rls-test.ts`

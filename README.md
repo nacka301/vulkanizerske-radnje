@@ -67,13 +67,29 @@ dostupan u toj sesiji) — vidi git log poruku Faze 1 i `DECISIONS.md`. Kad
 `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_ANON_KEY` postoje u env-u, ove skripte
 rade identičnu provjeru automatizirano.
 
+### Rucna provjera Faze 2 (klijentski tok)
+
+`pnpm build`/`tsc`/`lint`/`vitest` prolaze, ali stvarni `pnpm dev` +
+pregledavanje `/r/demo` nije pokrenuto u ovoj sesiji (nedostajao je
+`SUPABASE_SERVICE_ROLE_KEY` — vidi DECISIONS.md). Nakon sto postavis
+`.env.local` provjeri:
+
+1. `/r/demo` — odaberi uslugu, termin (odbrojavanje od 3 min), upisi
+   podatke, potvrdi rezervaciju (bez pravih Turnstile kljuceva captcha je
+   razvojni mock koji automatski prolazi).
+2. Ekran potvrde prikazuje registraciju/datum/vrijeme/adresu i poveznicu na
+   `/r/demo/b/[token]`.
+3. Na `/r/demo/b/[token]` otkazi termin i provjeri da status postane
+   "Otkazano".
+4. `/privatnost` se ucitava.
+
 ## Faze razvoja
 
 Vidi `claude-code-prompt.md` poglavlje 10. Status faza:
 
 - [x] Faza 0 — temelj
 - [x] Faza 1 — jezgra (baza, SQL funkcije, konkurentnost)
-- [ ] Faza 2 — klijentski tok rezervacije
+- [x] Faza 2 — klijentski tok rezervacije
 - [ ] Faza 3 — SMS
 - [ ] Faza 4 — dashboard radionice
 - [ ] Faza 5 — super admin
