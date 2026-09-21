@@ -283,3 +283,71 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   = zasebna transakcija) i kao simulirane `authenticated`/`anon` sesije
   (`set local role` + `request.jwt.claims`) — svi prolaze, vidi git log
   Faze 1.
+
+## Redizajn i post-launch popravci (2026-09-21)
+
+- **Vizualni redizajn**: default shadcn siva paleta zamijenjena
+  narancastom brend bojom + toplim neutralnim tonovima (`globals.css`),
+  Card dobio realnu sjenu/border. Usput otkriven i popravljen pravi bug:
+  `--font-sans: var(--font-sans)` kruzna referenca u `globals.css` je
+  cinila da citava app tiho pada na browserov default (serif) font
+  umjesto ucitanog Geist Sans-a.
+- **`Select` (`@base-ui/react/select`) prikazivao sirovi `value` umjesto
+  labela** (npr. UUID usluge u brzom unosu, broj slotova umjesto "60
+  min"): Base UI-jev `<Select.Value>` po defaultu ispisuje sirovu
+  vrijednost osim ako se root `<Select>` ne opskrbi `items` propom
+  (`Record<string, ReactNode>` mapa value->label) ili `<SelectValue>`
+  ne dobije render-funkciju kao children. Popravljeno dodavanjem `items`
+  na sva tri mjesta koja koriste `Select` (brzi unos, trajanje usluge,
+  filter radionice/grupiranje u statistici).
+- **`/admin` raspored**: native `<input type="date">` (ruzan
+  browser-nativni picker) zamijenjen nasim stiliziranim `Calendar`
+  komponentom kao pocetnim prikazom; klik na datum prebacuje na dnevni
+  raspored (isti prikaz kao prije).
+- **Dnevna pauza (rucak) po danu u tjednu**: dodani `break_start`/
+  `break_end` (nullable `time`) stupci na `store_hours` (migracije
+  `store_hours_break`, `fn_availability_break`), s check-constraintima
+  (poravnato na 30 min, par, unutar radnog vremena). `get_availability()`
+  sad tretira celije unutar pauze kao potpuno zauzete (isti mehanizam
+  kao `slot_blocks`, ali po tjednom danu umjesto apsolutnog datuma).
+  Admin postavke UI: opcionalni prekidac "Pauza" po danu s dva time
+  inputa, defaultira na 12:00-12:30 kad se ukljuci.
+- **RPC pozivi s `null` za "opcionalni" uuid/text parametar** (npr.
+  `store_stats(p_store_id)` = null znaci "sve radionice",
+  `create_booking(p_name/p_phone)` = null za walk-in bez podataka):
+  Supabase-generirani tipovi za RPC `Args` ne markiraju takve parametre
+  kao `| null` (samo parametri s defaultom dobiju `?:`), iako ih
+  Postgres na SQL razini uvijek prima kao nullable. Postojeci pozivi u
+  `admin/actions.ts` i `super/actions.ts` su zato od regeneracije tipova
+  (nakon migracije pauze) trebali `null as unknown as string` cast —
+  namjeran, ne mijenja runtime ponasanje, samo zaobilazi netocnu
+  strogost generatora.
+- **`license_plate` postao opcionalan**: brzi unos (admin, telefonska/
+  walk-in rezervacija) cesto nema oznaku u trenutku zapisa, pa je
+  `bookings.license_plate` prebacen s `not null` na nullable (+
+  `bookings_plate_format` dopusta null). `create_booking` dobio je i
+  `p_notes` parametar (stupac `notes` je postojao u shemi ali se nigdje
+  nije pisao). Online booking flow (`/r/[slug]`) i dalje trazi oznaku na
+  razini forme/Zod validacije — DB samo vise ne nameci to globalno. Kad
+  oznake nema, admin raspored i `BookingRow` prikazuju ime klijenta
+  umjesto oznake; `build_sms_body` CONFIRMATION poruka ima granu bez
+  oznake.
+- **`stores.slot_minutes` sad dopusta 15 ili 30** (bio fiksno `= 30`):
+  trebalo je da trajanje usluge moze biti npr. 45 min (nije visekratnik
+  30). Demo radionica je rucno prebacena na 15 min grid, a
+  `store_services.slots` za postojece usluge udvostrucen da stvarno
+  trajanje ostane isto (Gume na felgama i dalje 30 min, Premontiravanje
+  60 min). Nove radionice i dalje defaultiraju na 30 (stupac default
+  nepromijenjen). UI za trajanje usluge (`ServicesCard`) sad je broj-input
+  u minutama koji se na blur zaokruzuje na najblizi visekratnik
+  `slot_minutes`, umjesto padajuceg izbornika s fiksnim opcijama.
+- **`/login` split-screen s uzivo pregledom `/r/demo` u iframeu** (lijevo
+  "kako izgleda klijentu", desno forma): ovo je zahtijevalo popustanje
+  dva razlicita sigurnosna headera koja bi inace blokirala iframe na
+  ISTOM originu — `X-Frame-Options: DENY` u `next.config.ts` (dodano
+  `SAMEORIGIN` pravilo specificno za `/r/:path*`, primjenjuje se nakon
+  opceg DENY pravila pa ga override-a samo za tu putanju) i
+  `frame-ancestors 'none'` u CSP-u (`src/proxy.ts`, sad `'self'` samo za
+  `/r/*` puteve — `frame-ancestors` u modernim browserima nadjacava
+  `X-Frame-Options` pa je popustanje jednog bez drugog nedovoljno).
+  `/admin` i `/super` ostaju potpuno zasticeni (DENY / 'none').

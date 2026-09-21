@@ -60,7 +60,7 @@ export function ManageBookingView({ token, booking: initialBooking }: { token: s
             {STATUS_LABELS[booking.status]}
           </Badge>
         </div>
-        <Row label={hr.booking.confirmation.plateLabel} value={formatPlateDisplay(booking.license_plate)} big />
+        <Row label={hr.booking.confirmation.plateLabel} value={formatPlateDisplay(booking.license_plate ?? "")} big />
         <Row label={hr.booking.summary.service} value={booking.serviceName} />
         <Row label={hr.booking.confirmation.dateLabel} value={formatHrDate(booking.start_time, booking.storeTimezone)} />
         <Row label={hr.booking.confirmation.timeLabel} value={formatHrTime(booking.start_time, booking.storeTimezone)} />

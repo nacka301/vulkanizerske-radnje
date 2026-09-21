@@ -7,6 +7,7 @@ import { DetailsStep, type DetailsFormValues } from "./details-step";
 import { ConfirmationStep } from "./confirmation-step";
 import { createBookingAction, type AvailabilitySlot, type CreatedBooking, type PublicService, type PublicStore } from "./actions";
 import { hr } from "@/messages/hr";
+import { cn } from "@/lib/utils";
 
 type Step =
   | { name: "service" }
@@ -106,20 +107,31 @@ function StepIndicator({ step }: { step: Step["name"] }) {
   const activeIndex = steps.findIndex((s) => s.key === step);
 
   return (
-    <ol className="mb-6 flex items-center gap-2 text-sm">
+    <ol className="mb-8 flex items-center text-sm">
       {steps.map((s, i) => (
-        <li key={s.key} className="flex items-center gap-2">
-          <span
-            className={
-              i <= activeIndex
-                ? "flex size-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
-                : "flex size-6 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground"
-            }
-          >
-            {i + 1}
-          </span>
-          <span className={i === activeIndex ? "font-medium" : "text-muted-foreground"}>{s.label}</span>
-          {i < steps.length - 1 && <span className="mx-1 text-muted-foreground">/</span>}
+        <li key={s.key} className="flex flex-1 items-center last:flex-none">
+          <div className="flex items-center gap-2">
+            <span
+              className={
+                i <= activeIndex
+                  ? "flex size-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground shadow-sm"
+                  : "flex size-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground"
+              }
+            >
+              {i + 1}
+            </span>
+            <span className={i === activeIndex ? "font-medium whitespace-nowrap" : "whitespace-nowrap text-muted-foreground"}>
+              {s.label}
+            </span>
+          </div>
+          {i < steps.length - 1 && (
+            <span
+              className={cn(
+                "mx-3 h-0.5 flex-1 rounded-full transition-colors",
+                i < activeIndex ? "bg-primary" : "bg-muted",
+              )}
+            />
+          )}
         </li>
       ))}
     </ol>

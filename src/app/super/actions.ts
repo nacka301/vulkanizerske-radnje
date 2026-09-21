@@ -185,7 +185,7 @@ export async function getStoreStatsAction(
   const admin = createAdminClient();
 
   const { data, error } = await admin.rpc("store_stats", {
-    p_store_id: storeId,
+    p_store_id: storeId ?? (null as unknown as string),
     p_from: from,
     p_to: to,
     p_group: group,

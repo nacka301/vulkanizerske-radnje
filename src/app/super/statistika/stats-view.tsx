@@ -74,7 +74,11 @@ export function StatsView({ stores }: { stores: { id: string; name: string }[] }
       <Card className="mt-4 flex flex-wrap items-end gap-4 p-4">
         <div className="space-y-1.5">
           <Label>{hr.super.list.title}</Label>
-          <Select value={storeId} onValueChange={(v) => v && setStoreId(v)}>
+          <Select
+            items={{ all: hr.super.stats.allStores, ...Object.fromEntries(stores.map((s) => [s.id, s.name])) }}
+            value={storeId}
+            onValueChange={(v) => v && setStoreId(v)}
+          >
             <SelectTrigger className="w-56">
               <SelectValue />
             </SelectTrigger>
@@ -98,7 +102,11 @@ export function StatsView({ stores }: { stores: { id: string; name: string }[] }
         </div>
         <div className="space-y-1.5">
           <Label>&nbsp;</Label>
-          <Select value={group} onValueChange={(v) => v && setGroup(v as "day" | "month")}>
+          <Select
+            items={{ day: hr.super.stats.groupDay, month: hr.super.stats.groupMonth }}
+            value={group}
+            onValueChange={(v) => v && setGroup(v as "day" | "month")}
+          >
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>

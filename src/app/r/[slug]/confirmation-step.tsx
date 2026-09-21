@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatPlateDisplay } from "@/lib/plate";
@@ -21,17 +22,20 @@ export function ConfirmationStep({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">{hr.booking.confirmation.title}</h1>
+      <div className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+        <Check className="size-7" strokeWidth={2.5} />
+      </div>
+      <h1 className="mt-4 text-2xl font-bold">{hr.booking.confirmation.title}</h1>
 
       <Card className="mt-6 space-y-3 p-6">
-        <Row label={hr.booking.confirmation.plateLabel} value={formatPlateDisplay(booking.license_plate)} big />
+        <Row label={hr.booking.confirmation.plateLabel} value={formatPlateDisplay(booking.license_plate ?? "")} big />
         <Row label={hr.booking.confirmation.dateLabel} value={formatHrDate(booking.start_time, store.timezone)} />
         <Row label={hr.booking.confirmation.timeLabel} value={formatHrTime(booking.start_time, store.timezone)} />
         {store.address && <Row label={hr.booking.confirmation.addressLabel} value={store.address} />}
       </Card>
 
       <p className="mt-6 text-sm text-muted-foreground">{hr.booking.confirmation.manageLinkIntro}</p>
-      <Button render={<Link href={manageHref} />} variant="outline" className="mt-2 w-full">
+      <Button render={<Link href={manageHref} />} nativeButton={false} variant="outline" className="mt-2 w-full">
         {hr.booking.confirmation.manageLinkCta}
       </Button>
 

@@ -33,7 +33,9 @@ export default async function SuperStoreListPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{hr.super.list.title}</h1>
-        <Button render={<Link href="/super/radionice/nova" />}>{hr.super.list.newStore}</Button>
+        <Button render={<Link href="/super/radionice/nova" />} nativeButton={false}>
+          {hr.super.list.newStore}
+        </Button>
       </div>
 
       {!stores || stores.length === 0 ? (

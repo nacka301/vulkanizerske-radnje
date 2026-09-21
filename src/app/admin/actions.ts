@@ -3,7 +3,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStoreAdmin } from "@/lib/require-store-admin";
 import { mapBookingError } from "@/lib/booking-errors";
-import { normalizePlate, isValidPlate } from "@/lib/plate";
 import { normalizePhone } from "@/lib/phone";
 
 type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
@@ -51,14 +50,14 @@ export async function rescheduleBookingAction(
 export async function quickEntryAction(input: {
   serviceId: string;
   startTime: string;
-  plate: string;
   name: string;
   phone: string;
+  notes: string;
 }): Promise<ActionResult> {
   const { storeId } = await requireStoreAdmin();
 
-  const plate = normalizePlate(input.plate);
-  if (!isValidPlate(plate)) return { ok: false, error: "Registarska oznaka nije ispravna." };
+  const name = input.name.trim();
+  if (!name) return { ok: false, error: "Ime i prezime su obavezni." };
 
   let phone: string | null = null;
   if (input.phone.trim()) {
@@ -71,11 +70,12 @@ export async function quickEntryAction(input: {
     p_store_id: storeId,
     p_service_id: input.serviceId,
     p_start: input.startTime,
-    p_plate: plate,
-    p_name: input.name.trim() || null,
-    p_phone: phone,
+    p_plate: null as unknown as string,
+    p_name: name,
+    p_phone: phone ?? (null as unknown as string),
     p_source: "PHONE",
-    p_hold_id: null,
+    p_hold_id: undefined,
+    p_notes: input.notes.trim() || undefined,
   });
 
   if (error) return { ok: false, error: mapBookingError(error.message) };

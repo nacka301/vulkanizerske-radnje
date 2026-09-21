@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatHrTime } from "@/lib/format-hr";
 import { hr } from "@/messages/hr";
@@ -34,9 +35,9 @@ export function QuickEntryDialog({
   const [todaySlots, setTodaySlots] = useState<AdminAvailabilitySlot[]>([]);
   const [tomorrowSlots, setTomorrowSlots] = useState<AdminAvailabilitySlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  const [plate, setPlate] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,9 +52,9 @@ export function QuickEntryDialog({
         setServiceId(services[0].id);
       }
       setSelectedSlot(null);
-      setPlate("");
       setName("");
       setPhone("");
+      setNotes("");
       setError(null);
     }
 
@@ -90,7 +91,7 @@ export function QuickEntryDialog({
     setSubmitting(true);
     setError(null);
 
-    const result = await quickEntryAction({ serviceId, startTime: selectedSlot, plate, name, phone });
+    const result = await quickEntryAction({ serviceId, startTime: selectedSlot, name, phone, notes });
     setSubmitting(false);
 
     if (!result.ok) {
@@ -113,7 +114,11 @@ export function QuickEntryDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label>{hr.admin.quickEntry.service}</Label>
-            <Select value={serviceId} onValueChange={(value) => value && setServiceId(value)}>
+            <Select
+              items={Object.fromEntries(services.map((s) => [s.id, s.name]))}
+              value={serviceId}
+              onValueChange={(value) => value && setServiceId(value)}
+            >
               <SelectTrigger className="h-12 w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -139,22 +144,10 @@ export function QuickEntryDialog({
             </div>
           )}
 
-          <div className="space-y-1.5">
-            <Label htmlFor="qe-plate">{hr.admin.quickEntry.plate}</Label>
-            <Input
-              id="qe-plate"
-              required
-              value={plate}
-              onChange={(e) => setPlate(e.target.value.toUpperCase())}
-              placeholder={hr.admin.quickEntry.platePlaceholder}
-              className="h-12 text-base"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="qe-name">{hr.admin.quickEntry.name}</Label>
-              <Input id="qe-name" value={name} onChange={(e) => setName(e.target.value)} className="h-12" />
+              <Input id="qe-name" required value={name} onChange={(e) => setName(e.target.value)} className="h-12" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="qe-phone">{hr.admin.quickEntry.phone}</Label>
@@ -162,10 +155,21 @@ export function QuickEntryDialog({
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label htmlFor="qe-notes">{hr.admin.quickEntry.notes}</Label>
+            <Textarea
+              id="qe-notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={hr.admin.quickEntry.notesPlaceholder}
+              className="min-h-20"
+            />
+          </div>
+
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <DialogFooter>
-            <Button type="submit" size="lg" className="h-12 w-full" disabled={submitting || !selectedSlot || !plate}>
+            <Button type="submit" size="lg" className="h-12 w-full" disabled={submitting || !selectedSlot || !name.trim()}>
               {submitting ? hr.admin.quickEntry.submitting : hr.admin.quickEntry.submit}
             </Button>
           </DialogFooter>

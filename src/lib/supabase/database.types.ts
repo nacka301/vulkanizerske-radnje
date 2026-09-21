@@ -2,7 +2,13 @@
 // projektom vulkanizerske-radnje. Regeneriraj nakon svake migracije koja
 // mijenja shemu/funkcije.
 
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -69,7 +75,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
-          license_plate: string
+          license_plate: string | null
           manage_token: string
           manage_token_hash: string | null
           notes: string | null
@@ -88,7 +94,7 @@ export type Database = {
           created_at?: string
           end_time: string
           id?: string
-          license_plate: string
+          license_plate?: string | null
           manage_token?: string
           manage_token_hash?: string | null
           notes?: string | null
@@ -107,7 +113,7 @@ export type Database = {
           created_at?: string
           end_time?: string
           id?: string
-          license_plate?: string
+          license_plate?: string | null
           manage_token?: string
           manage_token_hash?: string | null
           notes?: string | null
@@ -340,6 +346,8 @@ export type Database = {
       }
       store_hours: {
         Row: {
+          break_end: string | null
+          break_start: string | null
           close_time: string
           is_closed: boolean
           open_time: string
@@ -347,6 +355,8 @@ export type Database = {
           weekday: number
         }
         Insert: {
+          break_end?: string | null
+          break_start?: string | null
           close_time: string
           is_closed?: boolean
           open_time: string
@@ -354,6 +364,8 @@ export type Database = {
           weekday: number
         }
         Update: {
+          break_end?: string | null
+          break_start?: string | null
           close_time?: string
           is_closed?: boolean
           open_time?: string
@@ -483,6 +495,30 @@ export type Database = {
         Args: { p_key: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
       }
+      claim_pending_sms: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          body: string
+          booking_id: string | null
+          created_at: string
+          error: string | null
+          id: string
+          kind: Database["public"]["Enums"]["sms_kind"]
+          provider_message_id: string | null
+          scheduled_at: string
+          sending_at: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["sms_status"]
+          to_phone: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "sms_outbox"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       client_cancel_booking: {
         Args: { p_token: string }
         Returns: {
@@ -491,7 +527,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
-          license_plate: string
+          license_plate: string | null
           manage_token: string
           manage_token_hash: string | null
           notes: string | null
@@ -504,12 +540,19 @@ export type Database = {
           store_id: string
           updated_at: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       create_booking: {
         Args: {
-          p_hold_id?: string | null
-          p_name: string | null
-          p_phone: string | null
+          p_hold_id?: string
+          p_name: string
+          p_notes?: string
+          p_phone: string
           p_plate: string
           p_service_id: string
           p_source: Database["public"]["Enums"]["booking_source"]
@@ -522,7 +565,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
-          license_plate: string
+          license_plate: string | null
           manage_token: string
           manage_token_hash: string | null
           notes: string | null
@@ -535,6 +578,12 @@ export type Database = {
           store_id: string
           updated_at: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       create_hold: {
         Args: { p_service_id: string; p_start: string; p_store_id: string }
@@ -546,6 +595,12 @@ export type Database = {
           service_id: string
           start_time: string
           store_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "slot_holds"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       get_availability: {
@@ -563,7 +618,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
-          license_plate: string
+          license_plate: string | null
           manage_token: string
           manage_token_hash: string | null
           notes: string | null
@@ -576,8 +631,15 @@ export type Database = {
           store_id: string
           updated_at: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       hr_strip_diacritics: { Args: { p_text: string }; Returns: string }
+      recover_stuck_sms: { Args: never; Returns: undefined }
       reschedule_booking: {
         Args: {
           p_actor: string
@@ -592,7 +654,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
-          license_plate: string
+          license_plate: string | null
           manage_token: string
           manage_token_hash: string | null
           notes: string | null
@@ -604,6 +666,12 @@ export type Database = {
           status_changed_at: string
           store_id: string
           updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       set_booking_status: {
@@ -620,7 +688,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
-          license_plate: string
+          license_plate: string | null
           manage_token: string
           manage_token_hash: string | null
           notes: string | null
@@ -633,12 +701,18 @@ export type Database = {
           store_id: string
           updated_at: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       store_stats: {
         Args: {
           p_from: string
           p_group?: string
-          p_store_id: string | null
+          p_store_id: string
           p_to: string
         }
         Returns: {
@@ -658,8 +732,8 @@ export type Database = {
       validate_booking_slot: {
         Args: {
           p_end: string
-          p_ignore_booking_id: string | null
-          p_ignore_hold_id: string | null
+          p_ignore_booking_id: string
+          p_ignore_hold_id: string
           p_start: string
           p_store_id: string
         }
@@ -679,9 +753,131 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database["public"]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-export type Tables<T extends keyof DefaultSchema["Tables"]> = DefaultSchema["Tables"][T]["Row"]
-export type TablesInsert<T extends keyof DefaultSchema["Tables"]> = DefaultSchema["Tables"][T]["Insert"]
-export type TablesUpdate<T extends keyof DefaultSchema["Tables"]> = DefaultSchema["Tables"][T]["Update"]
-export type Enums<T extends keyof DefaultSchema["Enums"]> = DefaultSchema["Enums"][T]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      booking_source: ["ONLINE", "PHONE", "WALK_IN"],
+      booking_status: ["CONFIRMED", "COMPLETED", "NO_SHOW", "CANCELLED"],
+      sms_kind: ["CONFIRMATION", "REMINDER", "CANCELLATION", "RESCHEDULE"],
+      sms_status: ["PENDING", "SENDING", "SENT", "FAILED", "CANCELLED"],
+      user_role: ["super_admin", "store_admin"],
+    },
+  },
+} as const

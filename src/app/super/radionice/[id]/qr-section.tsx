@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { Check, Copy, ExternalLink, Link as LinkIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { hr } from "@/messages/hr";
@@ -10,6 +11,7 @@ export function QrSection({ slug }: { slug: string }) {
   const [url, setUrl] = useState("");
   const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
   const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     async function run() {
@@ -25,6 +27,17 @@ export function QrSection({ slug }: { slug: string }) {
 
     void run();
   }, [slug]);
+
+  async function handleCopy() {
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard API moze biti nedostupna (http, dozvole) — tiho ignoriraj.
+    }
+  }
 
   function downloadSvg() {
     if (!svgMarkup) return;
@@ -61,11 +74,30 @@ export function QrSection({ slug }: { slug: string }) {
   return (
     <Card className="p-6">
       <h2 className="text-lg font-semibold">{hr.super.qr.title}</h2>
-      <p className="mt-1 break-all text-sm text-muted-foreground">{url}</p>
+
+      <div className="mt-3 flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2.5">
+        <LinkIcon className="size-4 shrink-0 text-muted-foreground" />
+        <span className="min-w-0 flex-1 truncate font-mono text-sm">{url || "…"}</span>
+        <Button type="button" variant="outline" size="sm" onClick={() => void handleCopy()} disabled={!url}>
+          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          {copied ? hr.admin.settings.linkCopied : hr.admin.settings.linkCopy}
+        </Button>
+      </div>
+
+      <Button
+        type="button"
+        variant="secondary"
+        className="mt-3"
+        disabled={!url}
+        onClick={() => window.open(url, "_blank", "noopener,noreferrer")}
+      >
+        <ExternalLink className="size-4" />
+        {hr.admin.settings.viewAsClient}
+      </Button>
 
       {pngDataUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={pngDataUrl} alt={hr.super.qr.title} className="mt-3 size-48" />
+        <img src={pngDataUrl} alt={hr.super.qr.title} className="mt-4 size-48" />
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">

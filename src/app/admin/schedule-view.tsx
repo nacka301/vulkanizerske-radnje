@@ -3,8 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TZDate } from "@date-fns/tz";
 import { addDays, format } from "date-fns";
+import { hr as hrLocale } from "date-fns/locale";
+import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { formatHrDate } from "@/lib/format-hr";
 import { hr } from "@/messages/hr";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { useWakeLock } from "@/lib/use-wake-lock";
@@ -16,9 +20,10 @@ import type { AdminService } from "./page";
 
 export type ScheduleBooking = {
   id: string;
-  license_plate: string;
+  license_plate: string | null;
   client_name: string | null;
   client_phone: string | null;
+  notes: string | null;
   start_time: string;
   end_time: string;
   status: "CONFIRMED" | "COMPLETED" | "NO_SHOW" | "CANCELLED";
@@ -34,6 +39,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
   useWakeLock();
 
   const [selectedDate, setSelectedDate] = useState(() => format(new TZDate(new Date(), store.timezone), "yyyy-MM-dd"));
+  const [view, setView] = useState<"calendar" | "day">("calendar");
   const [bookings, setBookings] = useState<ScheduleBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -51,7 +57,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
     const { data } = await supabase
       .from("bookings")
       .select(
-        "id, license_plate, client_name, client_phone, start_time, end_time, status, source, service_id, services (name)",
+        "id, license_plate, client_name, client_phone, notes, start_time, end_time, status, source, service_id, services (name)",
       )
       .eq("store_id", store.id)
       .gte("start_time", dayRange.start)
@@ -63,6 +69,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
       license_plate: b.license_plate,
       client_name: b.client_name,
       client_phone: b.client_phone,
+      notes: b.notes,
       start_time: b.start_time,
       end_time: b.end_time,
       status: b.status,
@@ -119,21 +126,49 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
   const active = bookings.filter((b) => b.status === "CONFIRMED");
   const done = bookings.filter((b) => b.status !== "CONFIRMED");
 
+  if (view === "calendar") {
+    return (
+      <div className="flex flex-col items-center py-4 text-center">
+        <h1 className="text-2xl font-bold">{hr.admin.schedule.pickDateTitle}</h1>
+        <p className="mt-1 text-muted-foreground">{hr.admin.schedule.pickDateSubtitle}</p>
+
+        <Card className="mt-6 w-fit p-4">
+          <Calendar
+            mode="single"
+            locale={hrLocale}
+            selected={new TZDate(`${selectedDate}T00:00:00`, store.timezone)}
+            onSelect={(d) => {
+              // Klik na vec odabrani (narancasti) dan react-day-picker tumaci
+              // kao deselect (d === undefined) — u tom slucaju ipak zelimo
+              // otvoriti taj isti (vec odabrani) dan, ne ignorirati klik.
+              setSelectedDate(d ? format(d, "yyyy-MM-dd") : selectedDate);
+              setView("day");
+            }}
+            className="[--cell-size:--spacing(11)]"
+          />
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{hr.admin.schedule.title}</h1>
-          <Button variant="outline" size="icon" onClick={() => setSelectedDate((d) => format(addDays(new TZDate(`${d}T00:00:00`, store.timezone), -1), "yyyy-MM-dd"))}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-12"
+            onClick={() => setView("calendar")}
+            aria-label={hr.admin.schedule.changeDate}
+          >
+            <CalendarDays className="size-5" />
+          </Button>
+          <Button variant="outline" size="icon" className="size-12" onClick={() => setSelectedDate((d) => format(addDays(new TZDate(`${d}T00:00:00`, store.timezone), -1), "yyyy-MM-dd"))}>
             &larr;
           </Button>
-          <Input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="h-12 w-auto text-base"
-          />
-          <Button variant="outline" size="icon" onClick={() => setSelectedDate((d) => format(addDays(new TZDate(`${d}T00:00:00`, store.timezone), 1), "yyyy-MM-dd"))}>
+          <h1 className="text-xl font-bold tabular-nums sm:text-2xl">{formatHrDate(`${selectedDate}T00:00:00`, store.timezone)}</h1>
+          <Button variant="outline" size="icon" className="size-12" onClick={() => setSelectedDate((d) => format(addDays(new TZDate(`${d}T00:00:00`, store.timezone), 1), "yyyy-MM-dd"))}>
             &rarr;
           </Button>
         </div>

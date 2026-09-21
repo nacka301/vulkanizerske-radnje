@@ -52,12 +52,22 @@ export function BookingRow({
       <div className="w-20 shrink-0 text-xl font-bold tabular-nums">{formatHrTime(booking.start_time, timezone)}</div>
 
       <div className="min-w-40 flex-1">
-        <div className="font-mono text-2xl font-bold tabular-nums">{formatPlateDisplay(booking.license_plate)}</div>
-        {(booking.client_name || booking.client_phone) && (
-          <div className="text-sm text-muted-foreground">
-            {[booking.client_name, booking.client_phone].filter(Boolean).join(" · ")}
-          </div>
+        {booking.license_plate ? (
+          <>
+            <div className="font-mono text-2xl font-bold tabular-nums">{formatPlateDisplay(booking.license_plate)}</div>
+            {(booking.client_name || booking.client_phone) && (
+              <div className="text-sm text-muted-foreground">
+                {[booking.client_name, booking.client_phone].filter(Boolean).join(" · ")}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="text-lg font-bold">{booking.client_name || hr.admin.schedule.noPlate}</div>
+            {booking.client_phone && <div className="text-sm text-muted-foreground">{booking.client_phone}</div>}
+          </>
         )}
+        {booking.notes && <div className="mt-1 text-sm text-muted-foreground italic">{booking.notes}</div>}
       </div>
 
       <Badge variant="secondary">{booking.serviceName}</Badge>
