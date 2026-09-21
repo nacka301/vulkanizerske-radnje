@@ -67,14 +67,14 @@ dostupan u toj sesiji) — vidi git log poruku Faze 1 i `DECISIONS.md`. Kad
 `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_ANON_KEY` postoje u env-u, ove skripte
 rade identičnu provjeru automatizirano.
 
-### Demo prijava (Faza 4)
+### Demo prijava (Faza 4/5)
 
-Demo store_admin racun za radionicu `demo`, kreiran izravno u `auth.users`
-(vidi DECISIONS.md):
+Demo racuni kreirani izravno u `auth.users` (vidi DECISIONS.md), oba na `/login`:
 
-- URL: `/login`
-- E-mail: `admin@demo.vulkanizer.hr`
-- Zaporka: `xjXTxCD6BCVH`
+| Uloga | E-mail | Zaporka |
+|---|---|---|
+| store_admin (radionica `demo`) | `admin@demo.vulkanizer.hr` | `xjXTxCD6BCVH` |
+| super_admin | `super@demo.vulkanizer.hr` | `A00ktSSSh8ug` |
 
 ### Rucna provjera Faze 4 (dashboard radionice)
 
@@ -86,6 +86,18 @@ Demo store_admin racun za radionicu `demo`, kreiran izravno u `auth.users`
    iskljuci uslugu, dodaj i obrisi blokadu.
 5. Odjava vraca na `/login`; pokusaj otvoriti `/admin` bez prijave — treba
    preusmjeriti na `/login`.
+
+### Rucna provjera Faze 5 (super admin)
+
+1. Prijavi se kao `super@demo.vulkanizer.hr` -> `/super` prikazuje popis
+   radionica s brojem rezervacija ovaj mjesec i stopom nedolazaka.
+2. "Nova radionica": upisi naziv i slug, provjeri live provjeru
+   dostupnosti sluga (probaj `admin` ili `demo` — trebaju biti odbijeni).
+3. Na stranici radionice: uredi podatke, dodaj administratora (privremena
+   zaporka se prikaze jednom), generiraj/preuzmi QR (SVG i PNG), otvori
+   ispis A5 naljepnice.
+4. `/super/statistika`: promijeni radionicu/razdoblje/grupiranje i provjeri
+   da se graf i tablica azuriraju.
 
 ### Rucna provjera Faze 2 (klijentski tok)
 
@@ -126,7 +138,7 @@ Vidi `claude-code-prompt.md` poglavlje 10. Status faza:
 - [x] Faza 2 — klijentski tok rezervacije
 - [x] Faza 3 — SMS
 - [x] Faza 4 — dashboard radionice
-- [ ] Faza 5 — super admin
+- [x] Faza 5 — super admin
 - [ ] Faza 6 — završna provjera
 
 ## Poznata ograničenja

@@ -207,6 +207,39 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   proci bez upozorenja (poglavlje 10, Faza 6), pa je datoteka preimenovana i
   funkcija exportana kao `proxy` umjesto `middleware`.
 
+## Faza 5
+
+- **Kreiranje admina radionice**: `createStoreAdminAction` koristi
+  `supabase.auth.admin.createUser` (service role) s generiranom privremenom
+  zaporkom (12 nasumicnih bajtova), prikazanom super-adminu JEDNOM u
+  sucelju odmah nakon kreiranja (ne sprema se nigdje). Spec spominje "poziv
+  emailom ili privremena zaporka" — buduci da SMTP/email provajder nije
+  konfiguriran (nema navedenih kljuceva), koristi se samo prikaz privremene
+  zaporke; e-mail poziv ostaje poznato ogranicenje za Fazu 6.
+- **`store_hours` se popunjava default vrijednostima pri kreiranju
+  radionice** (pon-pet 08-16, sub 08-13, ned zatvoreno) — super-admin ih
+  odmah moze prilagoditi kroz `/admin/postavke` (kao store_admin) ili
+  buduca dorada `/super` sucelja; spec ne trazi da super-admin forma za
+  novu radionicu odmah prikuplja puno radno vrijeme po danu, pa je default +
+  naknadna izmjena najjednostavnije rjesenje.
+- **QR kod generira se client-side** (`qrcode` paket, `QRCode.toDataURL`/
+  `toString`) koristeci `window.location.origin` kao baznu URL — izbjegava
+  potrebu za izlaganjem `APP_BASE_URL` kao `NEXT_PUBLIC_*` varijable, i
+  tocno odgovara stvarnoj domeni s koje je `/super` posluzen.
+- **Timezone kao slobodan tekst input** (default "Europe/Zagreb") umjesto
+  padajuceg izbornika IANA zona — MVP opseg je hrvatsko trziste, puni
+  IANA-zone picker nije potreban.
+- **Statistika bez graf-biblioteke**: jednostavan CSS bar-chart (div
+  visina proporcionalna vrijednosti) umjesto uvodenja nove ovisnosti izvan
+  fiksnog stacka iz poglavlja 2 — zadovoljava "grafovi po danu/mjesecu" bez
+  dodatne biblioteke.
+- **`store_stats` agregacija "sve radionice"**: kad je odabrano "Sve
+  radionice", RPC vraca redak po (bucket, store_id); klijent ih zbraja po
+  bucketu (`aggregateByBucket`) i ponovno racuna `no_show_rate` iz
+  zbrojenih brojaca (ne prosjek postotaka) da ostane matematicki ispravno.
+- **Demo super_admin racun** (`super@demo.vulkanizer.hr`) kreiran isto kao
+  demo store_admin u Fazi 4 — izravno u `auth.users` preko `execute_sql`.
+
 - **Test konkurentnosti/RLS bez service_role kljuca**: u ovoj sesiji
   Supabase MCP namjerno ne izlaze `service_role` kljuc (sigurnosno
   ogranicenje alata), pa `scripts/concurrency-test.ts`/`scripts/rls-test.ts`
