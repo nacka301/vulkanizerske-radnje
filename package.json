@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:concurrency": "tsx scripts/concurrency-test.ts"
+    "test:concurrency": "tsx scripts/concurrency-test.ts",
+    "test:rls": "tsx scripts/rls-test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

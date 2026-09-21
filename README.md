@@ -13,52 +13,66 @@ Next.js (App Router, TypeScript strict) + Tailwind + shadcn/ui, Supabase
 ## Preduvjeti
 
 - Node.js 20+, [pnpm](https://pnpm.io/) 9+
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (za
-  lokalni Supabase)
-- [Supabase CLI](https://supabase.com/docs/guides/cli)
+- Supabase projekt. Dvije opcije:
+  - **Cloud (default za ovaj repo)** — projekt je vec kreiran preko
+    Supabase MCP-a (vidi ispod), nije potreban Docker.
+  - **Lokalno** — [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+    + [Supabase CLI](https://supabase.com/docs/guides/cli), `supabase start`.
 
-## Lokalni razvoj
+## Supabase projekt
+
+Za ovaj repo koristi se **cloud Supabase projekt** `vulkanizerske-radnje`
+(ref `xwobgzzplievhlphjuox`, eu-central-1), a ne lokalni Docker stack —
+lokalni Docker Desktop na razvojnom stroju je bio nestabilan (poznat bug s
+"Inference manager" servisom), pa je Faza 1 verificirana izravno nad cloud
+projektom preko Supabase MCP alata (`apply_migration`/`execute_sql`), ne
+preko `supabase start`. Migracije u `supabase/migrations/` ostaju izvor
+istine i mogu se jednako primijeniti na lokalni stack ako Docker proradi
+(`supabase link --project-ref xwobgzzplievhlphjuox && supabase db push`,
+ili `supabase start` + `supabase db reset` za potpuno lokalan rad).
 
 ```bash
 pnpm install
 
-# pokreni lokalni Supabase (Postgres, Auth, Studio, Edge Functions runtime...)
-supabase start
-
-# supabase start ispisuje API URL i kljuceve — prepisi ih u .env.local
 cp .env.example .env.local
-# uredi .env.local: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-# SUPABASE_SERVICE_ROLE_KEY (iz "supabase start" outputa)
+# NEXT_PUBLIC_SUPABASE_URL i NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY su vec
+# poznati (vidi gore); SUPABASE_SERVICE_ROLE_KEY pokupi iz Supabase
+# dashboarda projekta (Project Settings -> API -> service_role) — MCP alat
+# namjerno ne izlaze taj kljuc.
 
 pnpm dev
 ```
 
-Aplikacija je na http://localhost:3000, Supabase Studio na
-http://localhost:54323 (portovi po `supabase/config.toml`).
-
 ### Migracije i seed
 
-Migracije žive u `supabase/migrations/`, primjenjuju se automatski na
-`supabase start` / `supabase db reset`. `supabase/seed.sql` sadrži jednu demo
-radionicu.
+Migracije žive u `supabase/migrations/` (primijenjene na cloud projekt preko
+MCP-a tijekom Faze 1). `supabase/seed.sql` sadrži jednu demo radionicu (vec
+ubacenu u cloud projekt).
 
-```bash
-supabase db reset   # briše lokalnu bazu, ponovno primjenjuje migracije + seed
-```
+Za lokalni Docker stack: `supabase start` + `supabase db reset` primjenjuje
+iste migracije i seed automatski.
 
 ### Testovi
 
 ```bash
 pnpm test              # vitest — čista logika (normalizacija, SMS predlošci, dostupnost, vremenske zone)
-pnpm test:concurrency  # skripta nad lokalnim Supabaseom (supabase start mora biti pokrenut) — provjerava da se isti termin ne moze dvostruko rezervirati
+pnpm test:concurrency  # skripta nad Supabaseom (treba SUPABASE_SERVICE_ROLE_KEY) — provjerava da se isti termin ne moze dvostruko rezervirati
+pnpm test:rls          # skripta nad Supabaseom (treba SERVICE_ROLE_KEY + ANON_KEY) — provjerava RLS izolaciju
 ```
+
+`pnpm test:concurrency` i `pnpm test:rls` su vec ručno ekvivalentno
+verificirani za Fazu 1 izravno preko Supabase MCP-a (20 paralelnih
+`execute_sql` poziva umjesto Node skripte, jer service_role ključ nije bio
+dostupan u toj sesiji) — vidi git log poruku Faze 1 i `DECISIONS.md`. Kad
+`SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_ANON_KEY` postoje u env-u, ove skripte
+rade identičnu provjeru automatizirano.
 
 ## Faze razvoja
 
 Vidi `claude-code-prompt.md` poglavlje 10. Status faza:
 
 - [x] Faza 0 — temelj
-- [ ] Faza 1 — jezgra (baza, SQL funkcije, konkurentnost)
+- [x] Faza 1 — jezgra (baza, SQL funkcije, konkurentnost)
 - [ ] Faza 2 — klijentski tok rezervacije
 - [ ] Faza 3 — SMS
 - [ ] Faza 4 — dashboard radionice
