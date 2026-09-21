@@ -240,6 +240,39 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
 - **Demo super_admin racun** (`super@demo.vulkanizer.hr`) kreiran isto kao
   demo store_admin u Fazi 4 — izravno u `auth.users` preko `execute_sql`.
 
+## Faza 6
+
+- **CSP dopusta `'unsafe-inline'` za `style-src`**: graf statistike
+  (`/super/statistika`) koristi React inline `style={{height:...}}` za
+  visinu stupaca — jednostavnije od generiranja nonce-a za svaki server
+  render. `script-src` ostaje strog (samo `'self'` + Cloudflare Turnstile
+  domena, `'unsafe-eval'` samo u razvoju za Fast Refresh).
+- **PII maskiranje u logovima**: jedino mjesto koje je stvarno logiralo
+  osobne podatke bio je `ConsoleSmsProvider` (broj mobitela u prefiksu
+  log linije) — sada maskiran (`+3859***...**67`). Sama poruka (body)
+  namjerno ostaje citljiva u devu jer je taj provajder JEDINI kanal
+  isporuke u razvoju (nema stvarnog SMS-a za usporediti) — potpuno
+  maskiranje bi ga ucinilo beskorisnim za lokalno debugiranje.
+- **Test "service_role kljuc nikad u klijentskom kodu"**
+  (`src/lib/no-service-role-in-client.test.ts`): umjesto custom ESLint
+  pravila, Vitest test skenira sve `"use client"` datoteke i provjerava da
+  nijedna ne referencira `SUPABASE_SERVICE_ROLE_KEY` niti uvozi
+  `supabase/admin`. `src/lib/supabase/admin.ts` dodatno ima
+  `import "server-only"` koji baca build-time gresku ako se ikad ubaci u
+  klijentski bundle — dvostruka zastita.
+- **Leaked password protection nije ukljucen preko migracije**: to je
+  Supabase Auth projekt-razine postavka (HaveIBeenPwned provjera), nema
+  odgovarajuci Supabase MCP poziv za nju (samo dashboard/Management API).
+  Ostaje kao poznato ogranicenje/rucni korak — vidi README.
+- **Sigurnosni/performance advisori na kraju Faze 6** (cloud projekt):
+  preostala upozorenja su sva svjesno prihvacena/dokumentirana ranije —
+  `rls_enabled_no_policy` (namjerno, service_role-only tablice),
+  `extension_in_public` za pg_net (ne moze se premjestiti),
+  `authenticated_security_definer_function_executable` za
+  `auth_role`/`auth_store_id` (namjerni izuzetak za RLS helper funkcije),
+  `auth_leaked_password_protection` (rucni korak), i INFO-level
+  `unused_index` (ocekivano na gotovo praznoj dev bazi).
+
 - **Test konkurentnosti/RLS bez service_role kljuca**: u ovoj sesiji
   Supabase MCP namjerno ne izlaze `service_role` kljuc (sigurnosno
   ogranicenje alata), pa `scripts/concurrency-test.ts`/`scripts/rls-test.ts`
