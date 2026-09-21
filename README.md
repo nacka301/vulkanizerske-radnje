@@ -40,8 +40,8 @@ pnpm dev
 
 | Uloga | E-mail | Zaporka |
 |---|---|---|
-| store_admin (radionica `demo`) | `admin@demo.vulkanizer.hr` | `xjXTxCD6BCVH` |
-| super_admin | `super@demo.vulkanizer.hr` | `A00ktSSSh8ug` |
+| store_admin (radionica `demo`) | `admin@vulkanizer.hr` | `admin123` |
+| super_admin | `super@vulkanizer.hr` | `super123` |
 
 Zamijeni ove zaporke prije bilo kakvog produkcijskog koristenja.
 
