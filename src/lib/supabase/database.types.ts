@@ -507,9 +507,9 @@ export type Database = {
       }
       create_booking: {
         Args: {
-          p_hold_id?: string
-          p_name: string
-          p_phone: string
+          p_hold_id?: string | null
+          p_name: string | null
+          p_phone: string | null
           p_plate: string
           p_service_id: string
           p_source: Database["public"]["Enums"]["booking_source"]

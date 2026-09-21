@@ -67,6 +67,26 @@ dostupan u toj sesiji) — vidi git log poruku Faze 1 i `DECISIONS.md`. Kad
 `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_ANON_KEY` postoje u env-u, ove skripte
 rade identičnu provjeru automatizirano.
 
+### Demo prijava (Faza 4)
+
+Demo store_admin racun za radionicu `demo`, kreiran izravno u `auth.users`
+(vidi DECISIONS.md):
+
+- URL: `/login`
+- E-mail: `admin@demo.vulkanizer.hr`
+- Zaporka: `xjXTxCD6BCVH`
+
+### Rucna provjera Faze 4 (dashboard radionice)
+
+1. Prijavi se na `/login` demo racunom (gore) — treba te odvesti na `/admin`.
+2. `/admin`: napravi rezervaciju preko `/r/demo` u drugom tabu i provjeri da
+   se pojavi bez osvjezavanja (Realtime), sa zvukom i isticanjem retka.
+3. Isprobaj "Brzi unos", "Odrađeno"/"Nije došao"/"Otkaži"/"Pomakni" na retku.
+4. `/admin/postavke`: promijeni radno vrijeme, broj dizalica, ukljuci/
+   iskljuci uslugu, dodaj i obrisi blokadu.
+5. Odjava vraca na `/login`; pokusaj otvoriti `/admin` bez prijave — treba
+   preusmjeriti na `/login`.
+
 ### Rucna provjera Faze 2 (klijentski tok)
 
 `pnpm build`/`tsc`/`lint`/`vitest` prolaze, ali stvarni `pnpm dev` +
@@ -105,7 +125,7 @@ Vidi `claude-code-prompt.md` poglavlje 10. Status faza:
 - [x] Faza 1 — jezgra (baza, SQL funkcije, konkurentnost)
 - [x] Faza 2 — klijentski tok rezervacije
 - [x] Faza 3 — SMS
-- [ ] Faza 4 — dashboard radionice
+- [x] Faza 4 — dashboard radionice
 - [ ] Faza 5 — super admin
 - [ ] Faza 6 — završna provjera
 

@@ -165,6 +165,48 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   `scheduled_at` pomaknut, na kraju `FAILED`). Svi scenariji prolaze — vidi
   git log poruku Faze 3.
 
+## Faza 4
+
+- **`requireStoreAdmin()` (src/lib/require-store-admin.ts)**: svaka admin
+  server akcija cita `store_id` iz `profiles` retka prijavljenog korisnika
+  preko SSR (kolacic) klijenta, nikad iz parametra koji salje klijent
+  (poglavlje 3, tocka 4 — "store_id iz profiles, nikad iz zahtjeva").
+  Nakon toga akcija koristi service-role klijent za stvarni upis/RPC poziv.
+- **Postavke (radno vrijeme, dizalice, usluge, blokade) idu izravnim
+  service-role upisom u tablice**, ne kroz SQL funkcije — u skladu s Fazom 1
+  odlukom da su SQL funkcije rezervirane za jezgru rezervacijske logike.
+  Greske iz DB CHECK constrainta (`store_hours_aligned`,
+  `stores_bays_check`...) mapiraju se na hrvatske poruke u
+  `admin/postavke/actions.ts`.
+- **Admin citanje ide izravno iz browsera + RLS** (poglavlje 3, tocka 3) za
+  obicne SELECT-ove (raspored, postavke na ucitavanju stranice preko SSR
+  klijenta). Iznimka: `get_availability` (za "Pomakni"/"Brzi unos") je
+  SECURITY DEFINER funkcija bez GRANT-a za `authenticated`, pa ide preko
+  server akcije (`adminAvailabilityAction`) sa service-role klijentom, uz
+  `requireStoreAdmin()` provjeru.
+- **Realtime**: `bookings` je dodan u `supabase_realtime` publikaciju
+  (migracija `20260921120000_enable_realtime_bookings.sql`). RLS i dalje
+  vrijedi za `postgres_changes` pretplate (store_admin prima samo redke
+  vlastite radionice), a `filter: store_id=eq.<id>` na kanalu je dodatna
+  ucinkovitost, ne sigurnosna granica.
+- **Zvuk bez audio datoteke**: `playBeep()` generira ton preko Web Audio
+  API-ja (oscillator) umjesto ucitavanja `.mp3` asseta — jednostavnije i bez
+  dodatnog binarnog fajla u repou.
+- **Screen Wake Lock**: `useWakeLock()` tiho ne radi nista ako API nije
+  podrzan (Safari desktop, stariji preglednici) — nije kriticno za MVP.
+- **"Brzi unos" default usluga**: zadnje koristena usluga pamti se u
+  `localStorage` (per-uredaj, ne per-korisnik) — dovoljno za jedan tablet po
+  radionici iz poglavlja 7; nije spremljeno u bazu jer nije potrebno dijeliti
+  izmedju uredaja.
+- **Demo store_admin racun** (`admin@demo.vulkanizer.hr`) kreiran izravno
+  preko `execute_sql` (isti pristup kao RLS testovi u Fazi 1) jer MCP nema
+  poziv ekvivalentan `supabase.auth.admin.createUser`. Lozinka je u
+  README-u — prihvatljivo za demo/dev racun, zamijeniti prije produkcije.
+- **`middleware.ts` -> `proxy.ts`**: Next.js 16 je preimenovao konvenciju
+  (stari naziv baca deprecation upozorenje na buildu); `pnpm build` mora
+  proci bez upozorenja (poglavlje 10, Faza 6), pa je datoteka preimenovana i
+  funkcija exportana kao `proxy` umjesto `middleware`.
+
 - **Test konkurentnosti/RLS bez service_role kljuca**: u ovoj sesiji
   Supabase MCP namjerno ne izlaze `service_role` kljuc (sigurnosno
   ogranicenje alata), pa `scripts/concurrency-test.ts`/`scripts/rls-test.ts`

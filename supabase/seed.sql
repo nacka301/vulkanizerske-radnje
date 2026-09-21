@@ -1,6 +1,7 @@
 -- Jedna demo radionica (poglavlje 10, Faza 0/1). Admin korisnici se ne
 -- seedaju ovdje jer zahtijevaju Supabase Auth (GoTrue), ne obicni SQL insert
--- — vidi scripts/create-admin.ts (Faza 4/5).
+-- — kreiraju se preko /super sucelja (Faza 5, koristi
+-- supabase.auth.admin.createUser) ili rucno u Supabase Studiju.
 
 insert into services (code, name, default_slots) values
   ('TIRES_ON_RIMS', 'Gume na felgama', 1),
