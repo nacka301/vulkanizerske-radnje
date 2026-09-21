@@ -351,3 +351,14 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   `/r/*` puteve — `frame-ancestors` u modernim browserima nadjacava
   `X-Frame-Options` pa je popustanje jednog bez drugog nedovoljno).
   `/admin` i `/super` ostaju potpuno zasticeni (DENY / 'none').
+- **Deploy na Vercel preko GitHuba, ne inline upload**: projekt vec ima
+  lokalni git repo (od ranijih Faza), pa je najisplativije bilo
+  `gh repo create --push` (privatni repo `nacka301/vulkanizerske-radnje`)
+  i zatim `create_git_project` + `create_deployment` s `gitSource` — Vercel
+  server sam povlaci kod, umjesto da se stotinjak fajlova (~700 KB izvora)
+  salje inline kroz MCP poziv (nepotrebno skupo tokenski i blizu limita
+  velicine poziva). Vercel projekt: `vulkanizerske-radnje-app` (team
+  `vaki`), SSO/deployment protection namjerno iskljucen (`ssoProtection:
+  null`) da link bude javno dostupan bez Vercel logina. `APP_BASE_URL`
+  (Vercel env) i `app_settings.app_base_url` (Supabase) rucno usklajeni na
+  stvarnu produkcijsku domenu nakon prvog deploya.
