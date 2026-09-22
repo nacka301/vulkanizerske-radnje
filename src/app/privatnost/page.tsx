@@ -2,6 +2,10 @@ export const metadata = {
   title: "Pravila privatnosti",
 };
 
+// Vidi napomenu u src/app/login/page.tsx — CSP nonce zahtijeva dinamicko
+// renderiranje, inace se JS na stranici blokira u produkciji.
+export const dynamic = "force-dynamic";
+
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">

@@ -2,6 +2,15 @@ import { LoginForm } from "./login-form";
 import { BrandMark } from "@/components/brand-mark";
 import { hr } from "@/messages/hr";
 
+// Poglavlje 8: mora ostati dinamicka stranica. Ako se statiki
+// predrendira (Next default za stranice bez dinamickih API poziva),
+// nonce upisan u <script> tagove je fiksiran u build-time HTML-u, dok
+// proxy.ts generira nov nonce za SVAKI zahtjev u CSP headeru — nikad se
+// ne poklapaju u produkciji, pa browser blokira sav JS (dugmad ne rade,
+// bez ijedne vidljive greske osim u konzoli). U `next dev` se ovo ne
+// primjecuje jer dev server sve renderira dinamicki. Vidi DECISIONS.md.
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   return (
     <main className="flex flex-1">

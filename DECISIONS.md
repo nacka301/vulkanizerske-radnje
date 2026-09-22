@@ -381,3 +381,20 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   Docker is not running" ali svejedno uspijeva (upload preko API-ja, ne
   treba lokalni bundler) — CLI `functions deploy` nije isto sto i
   `supabase start`, ne krsi pravilo "nema lokalnog Dockera".
+- **KRITICNI bug: `/login` bio statically prerenderiran u produkciji ->
+  sav JS blokiran CSP-om** (gumbi "Popuni"/"Prijavi se" doslovno nisu
+  radili, bez vidljive greske korisniku, samo u browser konzoli). Next.js
+  po defaultu statiki predrenderira stranice koje ne koriste dinamicke
+  API pozive; `proxy.ts` generira nov CSP nonce za SVAKI zahtjev, ali
+  staticki HTML ima nonce fiksiran u build-timeu — u produkciji se ta dva
+  nikad ne poklapaju, pa `strict-dynamic` CSP blokira bas sve skripte
+  (ukljucujuci Next-ovu vlastitu hidraciju). U `next dev` se ovo ne vidi
+  jer dev server uvijek renderira dinamicki, pa je bug preživio cijelu
+  sesiju lokalnog testiranja i tek se pojavio na Vercelu. Popravljeno
+  dodavanjem `export const dynamic = "force-dynamic"` na `/login` i
+  `/privatnost` (jedine preostale staticke stranice s klijentskim JS-om;
+  `/` ostaje staticka jer samo radi `redirect()` bez ikakve interakcije).
+  **Pravilo ubuduce**: svaka nova stranica koja renderira interaktivne
+  client komponente mora imati `dynamic = "force-dynamic"` osim ako je
+  vec dinamicka po drugoj osnovi (cita cookies/headers/searchParams),
+  inace CSP nonce prekine JS bez ijedne vidljive greske u UI-ju.
