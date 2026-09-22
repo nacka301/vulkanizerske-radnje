@@ -10,6 +10,11 @@ import { BrandMark } from "@/components/brand-mark";
 import { hr } from "@/messages/hr";
 import { loginAction } from "./actions";
 
+const DEMO_ACCOUNTS = [
+  { label: hr.auth.login.demoAdmin, email: "admin@vulkanizer.hr", password: "admin123" },
+  { label: hr.auth.login.demoSuperAdmin, email: "super@vulkanizer.hr", password: "super123" },
+];
+
 export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -66,6 +71,34 @@ export function LoginForm() {
           {submitting ? hr.auth.login.submitting : hr.auth.login.submit}
         </Button>
       </form>
+
+      <div className="mt-6 rounded-lg border border-dashed border-border/60 p-3">
+        <div className="text-xs font-semibold text-muted-foreground">{hr.auth.login.demoTitle}</div>
+        <div className="mt-2 space-y-2">
+          {DEMO_ACCOUNTS.map((acc) => (
+            <div key={acc.email} className="flex items-center justify-between gap-2 text-sm">
+              <div className="min-w-0">
+                <div className="font-medium">{acc.label}</div>
+                <div className="truncate font-mono text-xs text-muted-foreground">
+                  {acc.email} / {acc.password}
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => {
+                  setEmail(acc.email);
+                  setPassword(acc.password);
+                }}
+              >
+                {hr.auth.login.demoFill}
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
     </Card>
   );
 }
