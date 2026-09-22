@@ -95,9 +95,8 @@ export function TimeStep({
         &larr; {hr.common.back}
       </Button>
       <h1 className="text-2xl font-bold">{hr.booking.timeStep.title}</h1>
-      <p className="mt-1 text-muted-foreground">{hr.booking.timeStep.subtitle}</p>
 
-      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-2">
+      <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-2">
         {dateStrip.map((date) => (
           <button
             key={date}
@@ -133,12 +132,10 @@ export function TimeStep({
         </Popover>
       </div>
 
-      <p className="mt-2 text-xs text-muted-foreground">{hr.booking.timeStep.refreshHint}</p>
-
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
 
       {loading ? (
-        <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-11 w-full" />
           ))}

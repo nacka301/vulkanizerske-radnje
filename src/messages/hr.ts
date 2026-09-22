@@ -32,13 +32,11 @@ export const hr = {
     },
     timeStep: {
       title: "Odaberite termin",
-      subtitle: "Slobodni termini se osvježavaju automatski.",
       pickDate: "Odaberite drugi datum",
       morning: "Ujutro",
       afternoon: "Poslijepodne",
       noSlots: "Nema slobodnih termina za odabrani dan. Pokušajte drugi dan.",
       loadingSlots: "Tražim slobodne termine...",
-      refreshHint: "Dostupnost se osvježava svakih 20 sekundi.",
       holdFailed: "Termin je upravo zauzet. Odaberite drugi.",
     },
     hold: {
