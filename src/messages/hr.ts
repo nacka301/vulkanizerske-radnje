@@ -111,6 +111,7 @@ export const hr = {
       password: "Zaporka",
       submit: "Prijavi se",
       submitting: "Prijava...",
+      submittingNotice: "Pričekajte, prijava je u tijeku...",
       invalidCredentials: "Neispravan e-mail ili zaporka.",
       genericError: "Prijava nije uspjela. Pokušajte ponovno.",
       demoTitle: "Demo pristup (MVP)",

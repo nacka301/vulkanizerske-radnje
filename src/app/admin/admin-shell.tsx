@@ -45,16 +45,16 @@ export function AdminShell({ store, children }: { store: AdminStore; children: R
               <LogoutButton />
             </div>
           </div>
-          <nav className="flex gap-1 border-t border-border/60 px-2 py-1.5 sm:hidden">
+          <nav className="flex gap-1 border-t border-border/60 bg-muted/40 p-1.5 sm:hidden">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex min-h-11 flex-1 items-center justify-center rounded-lg text-sm font-medium transition-colors",
+                  "flex min-h-10 flex-1 items-center justify-center rounded-lg text-sm font-medium transition-colors",
                   pathname === item.href
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted",
+                    : "text-muted-foreground hover:bg-background/60",
                 )}
               >
                 {item.label}

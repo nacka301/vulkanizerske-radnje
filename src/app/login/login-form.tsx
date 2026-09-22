@@ -66,6 +66,11 @@ export function LoginForm() {
         <Button type="submit" className="w-full" disabled={submitting}>
           {submitting ? hr.auth.login.submitting : hr.auth.login.submit}
         </Button>
+        {submitting && (
+          <p className="text-center text-sm font-medium text-muted-foreground" aria-live="polite">
+            {hr.auth.login.submittingNotice}
+          </p>
+        )}
       </form>
 
       <div className="mt-6 rounded-lg border border-dashed border-border/60 p-3">

@@ -40,6 +40,28 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
 
   const [selectedDate, setSelectedDate] = useState(() => format(new TZDate(new Date(), store.timezone), "yyyy-MM-dd"));
   const [view, setView] = useState<"calendar" | "day">("calendar");
+
+  // Prelazak kalendar -> dan gura history zapis, tako da hardverska/
+  // browser "natrag" tipka vrati na kalendar umjesto da izade iz admina
+  // (na login) — bez ovoga je jedini history zapis bio login->admin.
+  useEffect(() => {
+    function onPopState(e: PopStateEvent) {
+      const state = e.state as { adminView?: "day" } | null;
+      setView(state?.adminView === "day" ? "day" : "calendar");
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const openDay = useCallback((date: string) => {
+    window.history.pushState({ adminView: "day" }, "");
+    setSelectedDate(date);
+    setView("day");
+  }, []);
+
+  const closeDay = useCallback(() => {
+    window.history.back();
+  }, []);
   const [bookings, setBookings] = useState<ScheduleBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -141,8 +163,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
               // Klik na vec odabrani (narancasti) dan react-day-picker tumaci
               // kao deselect (d === undefined) — u tom slucaju ipak zelimo
               // otvoriti taj isti (vec odabrani) dan, ne ignorirati klik.
-              setSelectedDate(d ? format(d, "yyyy-MM-dd") : selectedDate);
-              setView("day");
+              openDay(d ? format(d, "yyyy-MM-dd") : selectedDate);
             }}
             className="[--cell-size:--spacing(11)]"
           />
@@ -159,7 +180,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
             variant="outline"
             size="icon"
             className="size-12"
-            onClick={() => setView("calendar")}
+            onClick={closeDay}
             aria-label={hr.admin.schedule.changeDate}
           >
             <CalendarDays className="size-5" />
