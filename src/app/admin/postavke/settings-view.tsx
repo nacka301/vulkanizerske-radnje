@@ -8,17 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { hr } from "@/messages/hr";
 import { useAdminStore } from "../admin-store-context";
-import {
-  updateHoursAction,
-  updateBaysAction,
-  updateServiceAction,
-  addBlockAction,
-  deleteBlockAction,
-  type HourInput,
-} from "./actions";
+import { updateHoursAction, updateBaysAction, updateServiceAction, type HourInput } from "./actions";
 
 const WEEKDAY_LABELS = [
   hr.admin.settings.weekday1,
@@ -38,20 +30,17 @@ type HourRow = {
   break_start: string | null;
   break_end: string | null;
 };
-type BlockRow = { id: string; starts_at: string; ends_at: string; reason: string | null };
 type ServiceRow = { id: string; name: string; slots: number; enabled: boolean };
 
 export function SettingsView({
   bays,
   slotMinutes,
   hours,
-  blocks,
   services,
 }: {
   bays: number;
   slotMinutes: number;
   hours: HourRow[];
-  blocks: BlockRow[];
   services: ServiceRow[];
 }) {
   return (
@@ -61,7 +50,6 @@ export function SettingsView({
       <BaysCard initialBays={bays} />
       <HoursCard initialHours={hours} />
       <ServicesCard initialServices={services} slotMinutes={slotMinutes} />
-      <BlocksCard initialBlocks={blocks} />
     </div>
   );
 }
@@ -385,79 +373,3 @@ function DurationMinutesInput({
   );
 }
 
-function BlocksCard({ initialBlocks }: { initialBlocks: BlockRow[] }) {
-  const [blocks, setBlocks] = useState(initialBlocks);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [reason, setReason] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleAdd() {
-    if (!from || !to) return;
-    setSaving(true);
-    setError(null);
-    const result = await addBlockAction({
-      startsAt: new Date(from).toISOString(),
-      endsAt: new Date(to).toISOString(),
-      reason,
-    });
-    setSaving(false);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-    setBlocks((prev) => [...prev, { id: crypto.randomUUID(), starts_at: from, ends_at: to, reason: reason || null }]);
-    setFrom("");
-    setTo("");
-    setReason("");
-  }
-
-  async function handleDelete(id: string) {
-    setBlocks((prev) => prev.filter((b) => b.id !== id));
-    await deleteBlockAction(id);
-  }
-
-  return (
-    <Card className="p-6">
-      <h2 className="text-lg font-semibold">{hr.admin.settings.blocksTitle}</h2>
-
-      <div className="mt-3 space-y-2">
-        {blocks.map((block) => (
-          <div key={block.id} className="flex items-center justify-between rounded-md border p-3 text-sm">
-            <div>
-              <div className="font-medium">
-                {new Date(block.starts_at).toLocaleString("hr-HR")} &ndash; {new Date(block.ends_at).toLocaleString("hr-HR")}
-              </div>
-              {block.reason && <div className="text-muted-foreground">{block.reason}</div>}
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => void handleDelete(block.id)}>
-              {hr.admin.settings.blockDelete}
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      <Separator className="my-4" />
-
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1.5">
-          <Label className="text-sm">{hr.admin.settings.blockFrom}</Label>
-          <Input type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} className="h-10" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-sm">{hr.admin.settings.blockTo}</Label>
-          <Input type="datetime-local" value={to} onChange={(e) => setTo(e.target.value)} className="h-10" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-sm">{hr.admin.settings.blockReason}</Label>
-          <Input value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
-        </div>
-        <Button className="h-10" disabled={saving || !from || !to} onClick={handleAdd}>
-          {hr.admin.settings.blocksAdd}
-        </Button>
-      </div>
-      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
-    </Card>
-  );
-}

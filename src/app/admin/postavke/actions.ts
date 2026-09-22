@@ -14,7 +14,6 @@ function mapDbError(error: { message: string } | null): string {
   if (error.message.includes("store_hours_break_aligned")) return "Pauza mora biti poravnata na 30 minuta.";
   if (error.message.includes("stores_bays_check")) return "Broj dizalica mora biti barem 1.";
   if (error.message.includes("store_services_slots_check")) return "Trajanje usluge mora biti izmedju 1 i 8 termina.";
-  if (error.message.includes("slot_blocks_range_check")) return "Kraj blokade mora biti nakon pocetka.";
   return "Spremanje nije uspjelo. Provjerite unesene vrijednosti.";
 }
 
@@ -70,34 +69,6 @@ export async function updateServiceAction(
     .eq("store_id", storeId)
     .eq("service_id", serviceId);
 
-  if (error) return { ok: false, error: mapDbError(error) };
-  return { ok: true };
-}
-
-export async function addBlockAction(input: {
-  startsAt: string;
-  endsAt: string;
-  reason: string;
-}): Promise<ActionResult> {
-  const { storeId } = await requireStoreAdmin();
-  const admin = createAdminClient();
-
-  const { error } = await admin.from("slot_blocks").insert({
-    store_id: storeId,
-    starts_at: input.startsAt,
-    ends_at: input.endsAt,
-    reason: input.reason || null,
-  });
-
-  if (error) return { ok: false, error: mapDbError(error) };
-  return { ok: true };
-}
-
-export async function deleteBlockAction(blockId: string): Promise<ActionResult> {
-  const { storeId } = await requireStoreAdmin();
-  const admin = createAdminClient();
-
-  const { error } = await admin.from("slot_blocks").delete().eq("id", blockId).eq("store_id", storeId);
   if (error) return { ok: false, error: mapDbError(error) };
   return { ok: true };
 }

@@ -13,17 +13,12 @@ export default async function AdminSettingsPage() {
   const { data: profile } = await supabase.from("profiles").select("store_id").eq("id", user.id).maybeSingle();
   if (!profile?.store_id) redirect("/login");
 
-  const [{ data: store }, { data: hours }, { data: blocks }, { data: storeServices }] = await Promise.all([
+  const [{ data: store }, { data: hours }, { data: storeServices }] = await Promise.all([
     supabase.from("stores").select("bays, slot_minutes").eq("id", profile.store_id).maybeSingle(),
     supabase
       .from("store_hours")
       .select("weekday, open_time, close_time, is_closed, break_start, break_end")
       .eq("store_id", profile.store_id),
-    supabase
-      .from("slot_blocks")
-      .select("id, starts_at, ends_at, reason")
-      .eq("store_id", profile.store_id)
-      .order("starts_at"),
     supabase
       .from("store_services")
       .select("slots, enabled, services (id, name)")
@@ -39,7 +34,6 @@ export default async function AdminSettingsPage() {
       bays={store?.bays ?? 1}
       slotMinutes={store?.slot_minutes ?? 30}
       hours={hours ?? []}
-      blocks={blocks ?? []}
       services={services}
     />
   );
