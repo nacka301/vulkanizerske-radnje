@@ -52,6 +52,7 @@ export function OnboardingTour() {
 
   function finish() {
     setActive(false);
+    router.push("/admin");
   }
 
   function next() {
