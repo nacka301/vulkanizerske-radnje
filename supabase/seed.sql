@@ -5,7 +5,7 @@
 
 insert into services (code, name, default_slots) values
   ('TIRES_ON_RIMS', 'Gume na felgama', 1),
-  ('TIRE_REMOUNT', 'Premontiravanje', 2);
+  ('TIRE_REMOUNT', 'Bez felgi', 2);
 
 insert into stores (slug, name, address, phone, timezone, bays)
 values ('demo', 'Vulkanizer Demo', 'Ilica 1, Zagreb', '+385911234567', 'Europe/Zagreb', 2);
