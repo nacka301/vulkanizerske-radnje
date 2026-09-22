@@ -73,7 +73,7 @@ export function LoginSteps() {
             <iframe
               src="/r/demo"
               title={hr.auth.login.previewTitle}
-              className="h-[260px] w-full bg-background sm:h-[380px]"
+              className="h-[min(56dvh,460px)] w-full bg-background sm:h-[min(66dvh,640px)]"
             />
           </div>
 
