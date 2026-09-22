@@ -20,12 +20,11 @@ export function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(loginEmail: string, loginPassword: string) {
     setSubmitting(true);
     setError(null);
 
-    const result = await loginAction(email, password);
+    const result = await loginAction(loginEmail, loginPassword);
     setSubmitting(false);
 
     if (!result.ok) {
@@ -35,6 +34,17 @@ export function LoginForm() {
 
     router.push(result.role === "super_admin" ? "/super" : "/admin");
     router.refresh();
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    void submit(email, password);
+  }
+
+  function fillAndSubmit(acc: { email: string; password: string }) {
+    setEmail(acc.email);
+    setPassword(acc.password);
+    void submit(acc.email, acc.password);
   }
 
   return (
@@ -89,10 +99,8 @@ export function LoginForm() {
                 variant="outline"
                 size="sm"
                 className="shrink-0"
-                onClick={() => {
-                  setEmail(acc.email);
-                  setPassword(acc.password);
-                }}
+                disabled={submitting}
+                onClick={() => fillAndSubmit(acc)}
               >
                 {hr.auth.login.demoFill}
               </Button>
