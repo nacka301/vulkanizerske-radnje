@@ -111,7 +111,6 @@ export const hr = {
       genericError: "Prijava nije uspjela. Pokušajte ponovno.",
       demoTitle: "Demo pristup (MVP)",
       demoAdmin: "Admin radionice",
-      demoSuperAdmin: "Super admin",
       demoFill: "Popuni",
     },
     logout: "Odjava",

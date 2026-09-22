@@ -12,7 +12,6 @@ import { loginAction } from "./actions";
 
 const DEMO_ACCOUNTS = [
   { label: hr.auth.login.demoAdmin, email: "admin@vulkanizer.hr", password: "admin123" },
-  { label: hr.auth.login.demoSuperAdmin, email: "super@vulkanizer.hr", password: "super123" },
 ];
 
 export function LoginForm() {
