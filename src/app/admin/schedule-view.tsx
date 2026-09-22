@@ -174,7 +174,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -193,7 +193,7 @@ export function ScheduleView({ services }: { services: AdminService[] }) {
             &rarr;
           </Button>
         </div>
-        <Button size="lg" className="h-12 px-6 text-base" onClick={() => setQuickEntryOpen(true)}>
+        <Button size="lg" className="h-12 w-full px-6 text-base sm:w-auto" onClick={() => setQuickEntryOpen(true)}>
           {hr.admin.schedule.quickEntry}
         </Button>
       </div>

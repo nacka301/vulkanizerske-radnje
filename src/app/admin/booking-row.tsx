@@ -45,13 +45,13 @@ export function BookingRow({
   return (
     <Card
       className={cn(
-        "flex flex-wrap items-center gap-4 p-4 transition-colors",
+        "flex flex-col items-center gap-3 p-4 text-center transition-colors sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:text-left",
         highlighted && "border-primary bg-primary/5",
       )}
     >
-      <div className="w-20 shrink-0 text-xl font-bold tabular-nums">{formatHrTime(booking.start_time, timezone)}</div>
+      <div className="text-xl font-bold tabular-nums sm:w-20 sm:shrink-0">{formatHrTime(booking.start_time, timezone)}</div>
 
-      <div className="min-w-40 flex-1">
+      <div className="sm:min-w-40 sm:flex-1">
         {booking.license_plate ? (
           <>
             <div className="font-mono text-2xl font-bold tabular-nums">{formatPlateDisplay(booking.license_plate)}</div>
@@ -70,21 +70,23 @@ export function BookingRow({
         {booking.notes && <div className="mt-1 text-sm text-muted-foreground italic">{booking.notes}</div>}
       </div>
 
-      <Badge variant="secondary">{booking.serviceName}</Badge>
-      <Badge variant="outline">{SOURCE_LABELS[booking.source]}</Badge>
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+        <Badge variant="secondary">{booking.serviceName}</Badge>
+        <Badge variant="outline">{SOURCE_LABELS[booking.source]}</Badge>
+      </div>
 
       {isConfirmed && (
-        <div className="flex flex-wrap gap-2">
-          <Button size="lg" className="h-12" variant="outline" disabled={pending} onClick={() => handleStatus("COMPLETED")}>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+          <Button className="h-11 text-sm sm:h-12 sm:text-base" variant="outline" disabled={pending} onClick={() => handleStatus("COMPLETED")}>
             {hr.admin.schedule.actionDone}
           </Button>
-          <Button size="lg" className="h-12" variant="outline" disabled={pending} onClick={() => handleStatus("NO_SHOW")}>
+          <Button className="h-11 text-sm sm:h-12 sm:text-base" variant="outline" disabled={pending} onClick={() => handleStatus("NO_SHOW")}>
             {hr.admin.schedule.actionNoShow}
           </Button>
-          <Button size="lg" className="h-12" variant="outline" disabled={pending} onClick={() => setRescheduleOpen(true)}>
+          <Button className="h-11 text-sm sm:h-12 sm:text-base" variant="outline" disabled={pending} onClick={() => setRescheduleOpen(true)}>
             {hr.admin.schedule.actionReschedule}
           </Button>
-          <Button size="lg" className="h-12" variant="destructive" disabled={pending} onClick={() => setCancelOpen(true)}>
+          <Button className="h-11 text-sm sm:h-12 sm:text-base" variant="destructive" disabled={pending} onClick={() => setCancelOpen(true)}>
             {hr.admin.schedule.actionCancel}
           </Button>
         </div>
