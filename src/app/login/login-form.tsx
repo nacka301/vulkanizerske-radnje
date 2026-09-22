@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { BrandMark } from "@/components/brand-mark";
 import { hr } from "@/messages/hr";
 import { loginAction } from "./actions";
 
@@ -40,9 +39,7 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-sm p-6">
-      <BrandMark />
-      <h1 className="mt-4 text-xl font-bold">{hr.auth.login.title}</h1>
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{hr.auth.login.email}</Label>
           <Input

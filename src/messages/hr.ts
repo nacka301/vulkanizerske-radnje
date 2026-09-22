@@ -101,8 +101,12 @@ export const hr = {
   auth: {
     login: {
       title: "Vulkanizer Prijava",
+      previewStepLabel: "Prvo pogledajte",
       previewTitle: "Ovako klijenti rezerviraju termin",
-      previewSubtitle: "Uživo pregled stranice koju vide vaši klijenti kad rezerviraju termin.",
+      previewSubtitle: "Ovo je stranica koju vide vaši klijenti kad kod vas rezerviraju termin. Nemate ništa za napraviti ovdje — samo pogledajte.",
+      formStepLabel: "Zatim se prijavite",
+      formStepTitle: "Prijava za vlasnike radionice",
+      formStepSubtitle: "Ovdje se vi, kao vlasnik radionice, prijavljujete da biste vidjeli i uredili svoje termine.",
       email: "E-mail",
       password: "Zaporka",
       submit: "Prijavi se",
