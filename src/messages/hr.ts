@@ -46,7 +46,6 @@ export const hr = {
     },
     detailsStep: {
       title: "Vaši podaci",
-      subtitle: "Svi podaci su obavezni.",
       name: "Ime i prezime",
       namePlaceholder: "Ivan Horvat",
       phone: "Broj mobitela",
@@ -102,7 +101,7 @@ export const hr = {
       title: "Vulkanizer Prijava",
       previewStepLabel: "Prvo pogledajte",
       previewTitle: "Ovako klijenti rezerviraju termin",
-      previewSubtitle: "Ovo je stranica koju vide vaši klijenti kad kod vas rezerviraju termin. Nemate ništa za napraviti ovdje — samo pogledajte.",
+      previewSubtitle: "Ovo je stranica koju vide vaši klijenti kad kod vas rezerviraju termin.",
       formStepLabel: "Zatim se prijavite",
       formStepTitle: "Prijava za vlasnike radionice",
       formStepSubtitle: "Ovdje se vi, kao vlasnik radionice, prijavljujete da biste vidjeli i uredili svoje termine.",

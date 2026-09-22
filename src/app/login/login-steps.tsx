@@ -60,11 +60,11 @@ export function LoginSteps() {
       </div>
 
       {step === 1 ? (
-        <div className="mx-auto mt-4 max-w-xl">
+        <div className="mx-auto mt-3 max-w-xl">
           <h1 className="text-lg font-bold sm:text-2xl">{hr.auth.login.previewTitle}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{hr.auth.login.previewSubtitle}</p>
 
-          <div className="mt-3 overflow-hidden rounded-xl border border-border/60 bg-card shadow-lg">
+          <div className="mt-2 overflow-hidden rounded-xl border border-border/60 bg-card shadow-lg">
             <div className="flex items-center gap-1.5 border-b border-border/60 bg-muted/60 px-3 py-2">
               <span className="size-2.5 rounded-full bg-muted-foreground/30" />
               <span className="size-2.5 rounded-full bg-muted-foreground/30" />

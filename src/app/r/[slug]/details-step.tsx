@@ -59,13 +59,12 @@ export function DetailsStep({
         &larr; {hr.common.back}
       </Button>
       <h1 className="text-2xl font-bold">{hr.booking.detailsStep.title}</h1>
-      <p className="mt-1 text-muted-foreground">{hr.booking.detailsStep.subtitle}</p>
 
       <div
         className={
           secondsLeft <= 30
-            ? "mt-4 rounded-md border border-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            : "mt-4 rounded-md border bg-muted px-3 py-2 text-sm"
+            ? "mt-3 rounded-md border border-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            : "mt-3 rounded-md border bg-muted px-3 py-2 text-sm"
         }
       >
         {hr.booking.hold.countdownLabel}: {minutes}:{seconds.toString().padStart(2, "0")}
