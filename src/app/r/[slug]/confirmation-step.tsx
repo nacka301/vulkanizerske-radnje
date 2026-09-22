@@ -26,6 +26,7 @@ export function ConfirmationStep({
         <Check className="size-7" strokeWidth={2.5} />
       </div>
       <h1 className="mt-4 text-2xl font-bold">{hr.booking.confirmation.title}</h1>
+      <p className="mt-1 text-sm font-medium text-primary">{hr.booking.confirmation.checkPhoneNotice}</p>
 
       <Card className="mt-6 space-y-3 p-6">
         <Row label={hr.booking.confirmation.plateLabel} value={formatPlateDisplay(booking.license_plate ?? "")} big />

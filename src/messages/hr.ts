@@ -71,6 +71,7 @@ export const hr = {
     },
     confirmation: {
       title: "Rezervacija je potvrđena",
+      checkPhoneNotice: "Provjerite mobitel — stiže vam SMS potvrda rezervacije.",
       plateLabel: "Registracija",
       dateLabel: "Datum",
       timeLabel: "Vrijeme",
