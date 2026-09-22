@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ServiceStep } from "./service-step";
 import { TimeStep } from "./time-step";
 import { DetailsStep, type DetailsFormValues } from "./details-step";
@@ -19,6 +19,14 @@ export function BookingFlow({ store }: { store: PublicStore }) {
   const [step, setStep] = useState<Step>({ name: "service" });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const stepRef = useRef<HTMLDivElement>(null);
+
+  // Kod prelaska na novi korak (npr. "Termin") sadrzaj se na mobitelu
+  // centrira u vidljivom dijelu ekrana umjesto da ostane zalijepljen
+  // gore ili da ostane na staroj scroll poziciji proslog koraka.
+  useEffect(() => {
+    stepRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [step.name]);
 
   async function handleDetailsSubmit(values: DetailsFormValues) {
     if (step.name !== "details") return;
@@ -51,7 +59,7 @@ export function BookingFlow({ store }: { store: PublicStore }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 py-8">
+    <div ref={stepRef} className="mx-auto w-full max-w-lg px-4 py-8">
       <StepIndicator step={step.name} />
 
       {step.name === "service" && (
