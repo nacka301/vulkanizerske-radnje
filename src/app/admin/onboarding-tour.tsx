@@ -38,14 +38,28 @@ export function OnboardingTour() {
 
   useEffect(() => {
     if (!active || pathname !== "/admin/postavke") return;
-    const el = document.querySelector(STEPS[stepIndex].selector);
-    // Istaknuta kartica ide uz VRH ekrana, tekst s objasnjenjem ostaje
-    // fiksiran na dnu (odvojeno, bez preklapanja).
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    const t = setTimeout(measure, 350);
+
+    // Istaknuta kartica ide uz VRH ekrana (ispod stickog headera), tekst
+    // s objasnjenjem ostaje fiksiran na dnu. Racunamo apsolutnu poziciju
+    // sami (umjesto oslanjanja na scrollIntoView) i korigiramo je jos
+    // jednom nakon kratke pauze — ako se layout jos slagao (npr. QR kod
+    // se ucita async i pomakne sadrzaj ispod), prvi izracun zna biti
+    // netocan pa ga refresham.
+    const HEADER_OFFSET = 88;
+    function scrollToTarget() {
+      const el = document.querySelector(STEPS[stepIndex].selector);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
+
+    scrollToTarget();
+    const retry = setTimeout(scrollToTarget, 300);
+    const t = setTimeout(measure, 550);
     window.addEventListener("scroll", measure, true);
     window.addEventListener("resize", measure);
     return () => {
+      clearTimeout(retry);
       clearTimeout(t);
       window.removeEventListener("scroll", measure, true);
       window.removeEventListener("resize", measure);
