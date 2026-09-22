@@ -5,7 +5,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SmsProvider } from "./provider.ts";
 import { ConsoleSmsProvider } from "./console-provider.ts";
-import { TwilioSmsProvider } from "./twilio-provider.ts";
+import { InfobipSmsProvider } from "./infobip-provider.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -30,13 +30,13 @@ async function loadSettings(
 
 function resolveProvider(settings: Record<string, string>): SmsProvider {
   const provider = settings.sms_provider ?? "console";
-  if (provider === "twilio") {
-    const sid = settings.twilio_account_sid;
-    const token = settings.twilio_auth_token;
-    if (!sid || !token) {
-      throw new Error("twilio_account_sid/twilio_auth_token nisu postavljeni u app_settings");
+  if (provider === "infobip") {
+    const baseUrl = settings.infobip_base_url;
+    const apiKey = settings.infobip_api_key;
+    if (!baseUrl || !apiKey) {
+      throw new Error("infobip_base_url/infobip_api_key nisu postavljeni u app_settings");
     }
-    return new TwilioSmsProvider(sid, token);
+    return new InfobipSmsProvider(baseUrl, apiKey);
   }
   return new ConsoleSmsProvider();
 }

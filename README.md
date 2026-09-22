@@ -61,9 +61,9 @@ Zamijeni ove zaporke prije bilo kakvog produkcijskog koristenja.
    update app_settings set value = 'https://<tvoja-domena>' where key = 'app_base_url';
    update app_settings set value = '<novi-nasumicni-secret>' where key = 'worker_secret';
    update app_settings set value = 'https://<ref>.supabase.co/functions/v1/sms-worker' where key = 'sms_worker_url';
-   -- za Twilio umjesto console providera:
-   update app_settings set value = 'twilio' where key = 'sms_provider';
-   insert into app_settings (key, value) values ('twilio_account_sid','...'), ('twilio_auth_token','...')
+   -- za Infobip umjesto console providera:
+   update app_settings set value = 'infobip' where key = 'sms_provider';
+   insert into app_settings (key, value) values ('infobip_base_url','https://xxxxx.api.infobip.com'), ('infobip_api_key','...')
      on conflict (key) do update set value = excluded.value;
    ```
    (Razlog zasto konfiguracija ide preko `app_settings`, a ne Edge Function
@@ -170,10 +170,12 @@ Vidi `claude-code-prompt.md` poglavlje 10.
   dostupan — korisnik je preuzeo rucno testiranje. Sve je verificirano
   preko `tsc`/`lint`/`build`/`vitest` i izravnih SQL/`curl` provjera nad
   cloud projektom.
-- **Twilio nije stvarno testiran** (nema pravih kredencijala) — testiran
-  je samo error-path (retry/backoff) s namjerno pogresnim podacima.
-  `TwilioSmsProvider` implementira dokumentirani Twilio REST API poziv, ali
-  stvarna isporuka SMS-a nije potvrdjena.
+- **SMS provajder je Infobip** (`InfobipSmsProvider`) — prvotno je bio
+  Twilio, ali Twilio trial racun blokira i SMS i pozivnu verifikaciju za
+  hrvatske brojeve ("restricted country"), pa je zamijenjen Infobipom
+  (hrvatska tvrtka, nema tog ogranicenja). Stvarna isporuka jos nije
+  potvrdjena pravim kredencijalima — testiran je samo error-path
+  (retry/backoff) s namjerno pogresnim podacima.
 - **E-mail poziv admina nije implementiran** — spec spominje "poziv
   emailom ili privremena zaporka"; buduci da SMTP provajder nije
   konfiguriran, `/super` prikazuje samo privremenu zaporku jednokratno u

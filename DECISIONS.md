@@ -362,3 +362,22 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   null`) da link bude javno dostupan bez Vercel logina. `APP_BASE_URL`
   (Vercel env) i `app_settings.app_base_url` (Supabase) rucno usklajeni na
   stvarnu produkcijsku domenu nakon prvog deploya.
+- **SMS provajder zamijenjen: Twilio -> Infobip**: Twilio trial racun
+  blokira i SMS i pozivnu verifikaciju brojeva za Hrvatsku ("restricted
+  country"), pa realno testiranje s hrvatskim brojem na trialu nije bilo
+  moguce. `TwilioSmsProvider` obrisan, dodan `InfobipSmsProvider` (isto
+  `SmsProvider` sucelje, `POST {base_url}/sms/2/text/advanced`,
+  `Authorization: App {api_key}`, baca gresku na `status.groupName ===
+  'REJECTED'`). `resolveProvider()` u `sms-worker/index.ts` sad grana na
+  `sms_provider = 'infobip'` i cita `infobip_base_url`/`infobip_api_key`
+  iz `app_settings` (isti obrazac kao prije, samo drugi kljucevi).
+  `app_settings.sms_provider` vracen na `'console'` dok korisnik ne da
+  prave Infobip kredencijale. Deploy Edge Functiona ovaj put nije isao
+  preko Supabase MCP `deploy_edge_function` alata — taj alat u ovoj sesiji
+  dosljedno vraca `files: expected array, received string` (generi cka,
+  prazna shema alata `{"type":"object"}`, izgleda kao serijalizacijski bug
+  za ovaj konkretni alat) — nego preko `supabase functions deploy
+  sms-worker --no-verify-jwt` (CLI, vec ulogiran). Ispisuje "WARNING:
+  Docker is not running" ali svejedno uspijeva (upload preko API-ja, ne
+  treba lokalni bundler) — CLI `functions deploy` nije isto sto i
+  `supabase start`, ne krsi pravilo "nema lokalnog Dockera".
