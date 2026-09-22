@@ -7,6 +7,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { hr } from "@/messages/hr";
 import { cn } from "@/lib/utils";
 import { AdminStoreProvider, type AdminStore } from "./admin-store-context";
+import { OnboardingTour } from "./onboarding-tour";
 
 export function AdminShell({ store, children }: { store: AdminStore; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -66,6 +67,7 @@ export function AdminShell({ store, children }: { store: AdminStore; children: R
           <div className="mx-auto w-full max-w-5xl">{children}</div>
         </main>
       </div>
+      <OnboardingTour />
     </AdminStoreProvider>
   );
 }

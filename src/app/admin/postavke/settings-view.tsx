@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Copy, ExternalLink, Link as LinkIcon } from "lucide-react";
+import QRCode from "qrcode";
+import { Check, Copy, Download, ExternalLink, Link as LinkIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,10 +69,13 @@ export function SettingsView({
 function BookingLinkCard() {
   const store = useAdminStore();
   const [url, setUrl] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setUrl(`${window.location.origin}/r/${store.slug}`);
+    const bookingUrl = `${window.location.origin}/r/${store.slug}`;
+    setUrl(bookingUrl);
+    void QRCode.toDataURL(bookingUrl, { width: 320, margin: 2 }).then(setQrDataUrl);
   }, [store.slug]);
 
   async function handleCopy() {
@@ -85,8 +89,16 @@ function BookingLinkCard() {
     }
   }
 
+  function downloadQr() {
+    if (!qrDataUrl) return;
+    const link = document.createElement("a");
+    link.href = qrDataUrl;
+    link.download = `${store.slug}-qr.png`;
+    link.click();
+  }
+
   return (
-    <Card className="p-6">
+    <Card data-tour="link" className="p-6">
       <h2 className="text-lg font-semibold">{hr.admin.settings.bookingLinkTitle}</h2>
       <p className="mt-1 text-sm text-muted-foreground">{hr.admin.settings.bookingLinkSubtitle}</p>
 
@@ -109,6 +121,17 @@ function BookingLinkCard() {
         <ExternalLink className="size-4" />
         {hr.admin.settings.viewAsClient}
       </Button>
+
+      {qrDataUrl && (
+        <div className="mt-4 flex flex-col items-center gap-3 border-t border-border/60 pt-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={qrDataUrl} alt={hr.admin.settings.bookingLinkTitle} className="size-40 rounded-lg border border-border/60" />
+          <Button type="button" variant="outline" size="sm" onClick={downloadQr}>
+            <Download className="size-4" />
+            {hr.admin.settings.qrDownload}
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
@@ -181,7 +204,7 @@ function HoursCard({ initialHours }: { initialHours: HourRow[] }) {
   }
 
   return (
-    <Card className="p-6">
+    <Card data-tour="break" className="p-6">
       <h2 className="text-lg font-semibold">{hr.admin.settings.hoursTitle}</h2>
       <div className="mt-3 space-y-2">
         {rows.map((row) => (
@@ -279,7 +302,7 @@ function ServicesCard({ initialServices, slotMinutes }: { initialServices: Servi
   }
 
   return (
-    <Card className="p-6">
+    <Card data-tour="duration" className="p-6">
       <h2 className="text-lg font-semibold">{hr.admin.settings.servicesTitle}</h2>
       <div className="mt-4 space-y-3">
         {services.map((service) => (

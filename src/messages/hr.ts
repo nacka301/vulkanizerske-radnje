@@ -198,6 +198,21 @@ export const hr = {
       blockDelete: "Ukloni",
       saved: "Spremljeno.",
       saveError: "Spremanje nije uspjelo.",
+      qrDownload: "Preuzmi QR kod",
+    },
+    onboarding: {
+      skip: "Preskoči",
+      next: "Dalje",
+      done: "Gotovo",
+      step1Title: "Vaš link i QR kod za rezervacije",
+      step1Body:
+        "Ovo je vaš jedinstveni link za rezervacije. Pošaljite ga klijentima (SMS, Viber, Instagram) ili im pokažite QR kod da ga skeniraju mobitelom — odmah dolaze na rezervaciju termina kod vas.",
+      step2Title: "Sami upisujete trajanje usluga",
+      step2Body:
+        "Ovdje upišite koliko traje svaka usluga (npr. 30, 45, 60 min) — sustav to automatski zaokruži na vaše termine.",
+      step3Title: "Pauza tijekom dana",
+      step3Body:
+        "Za svaki dan možete uključiti pauzu (npr. za ručak) — u to vrijeme klijenti neće moći rezervirati termin.",
     },
   },
   super: {

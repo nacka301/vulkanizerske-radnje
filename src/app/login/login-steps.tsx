@@ -82,7 +82,7 @@ export function LoginSteps() {
           </Button>
         </div>
       ) : (
-        <div className="mx-auto mt-4 max-w-xl">
+        <div className="mx-auto mt-[14vh] max-w-xl sm:mt-6">
           <h2 className="text-lg font-bold sm:text-2xl">{hr.auth.login.formStepTitle}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{hr.auth.login.formStepSubtitle}</p>
 
