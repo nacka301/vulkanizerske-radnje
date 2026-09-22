@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { hr } from "@/messages/hr";
@@ -23,6 +23,7 @@ export function OnboardingTour() {
   const [active, setActive] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (pathname !== "/admin/postavke") {
@@ -39,7 +40,17 @@ export function OnboardingTour() {
   useEffect(() => {
     if (!active || pathname !== "/admin/postavke") return;
     const el = document.querySelector(STEPS[stepIndex].selector);
-    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (el) {
+      // Ne centriraj u cijelom ekranu — fiksna kartica s objasnjenjem
+      // zauzima dno ekrana, pa bi centriranje gurnulo istaknuti dio
+      // previsoko (daleko od teksta koji ga objasnjava). Umjesto toga
+      // istaknuti dio spustamo tik iznad kartice s tekstom.
+      const sheetHeight = sheetRef.current?.offsetHeight ?? 0;
+      const rectNow = el.getBoundingClientRect();
+      const desiredBottom = window.innerHeight - sheetHeight - 16;
+      const delta = rectNow.bottom - desiredBottom;
+      window.scrollBy({ top: delta, behavior: "smooth" });
+    }
     const t = setTimeout(measure, 350);
     window.addEventListener("scroll", measure, true);
     window.addEventListener("resize", measure);
@@ -81,7 +92,10 @@ export function OnboardingTour() {
           }}
         />
       )}
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-border bg-card p-5 shadow-2xl [padding-bottom:max(1.25rem,env(safe-area-inset-bottom))]">
+      <div
+        ref={sheetRef}
+        className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-border bg-card p-5 shadow-2xl [padding-bottom:max(1.25rem,env(safe-area-inset-bottom))]"
+      >
         <div className="mx-auto flex max-w-md flex-col gap-3">
           <div className="flex items-center gap-1.5">
             {STEPS.map((_, i) => (

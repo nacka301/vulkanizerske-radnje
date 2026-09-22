@@ -22,10 +22,10 @@ export function BookingFlow({ store }: { store: PublicStore }) {
   const stepRef = useRef<HTMLDivElement>(null);
 
   // Kod prelaska na novi korak (npr. "Termin") sadrzaj se na mobitelu
-  // centrira u vidljivom dijelu ekrana umjesto da ostane zalijepljen
-  // gore ili da ostane na staroj scroll poziciji proslog koraka.
+  // spusta prema dnu vidljivog dijela ekrana umjesto da ostane
+  // zalijepljen gore ili na staroj scroll poziciji proslog koraka.
   useEffect(() => {
-    stepRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    stepRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [step.name]);
 
   async function handleDetailsSubmit(values: DetailsFormValues) {
