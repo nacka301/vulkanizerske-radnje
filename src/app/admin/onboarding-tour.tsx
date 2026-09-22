@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { hr } from "@/messages/hr";
 import { cn } from "@/lib/utils";
-import { useAdminStore } from "./admin-store-context";
 
 const STEPS = [
   { selector: '[data-tour="link"]', title: hr.admin.onboarding.step1Title, body: hr.admin.onboarding.step1Body },
@@ -13,33 +12,21 @@ const STEPS = [
   { selector: '[data-tour="break"]', title: hr.admin.onboarding.step3Title, body: hr.admin.onboarding.step3Body },
 ];
 
-function storageKey(storeId: string) {
-  return `vulk-onboarding-done-${storeId}`;
-}
-
-// Vodic za vulkanizere pri prvoj prijavi: automatski ih odvede u Postavke
-// i redom istakne (spotlight) link/QR kod, upis trajanja usluge i pauzu
-// u danu, uz jednostavno objasnjenje svakog. Prikazuje se samo jednom po
-// radionici (localStorage), mobile-first (bottom sheet + spotlight).
+// Vodic za vulkanizere: svaki put kad udu u admin (svaka nova prijava/
+// ulazak, layout se ne re-montira kod navigacije unutar admina) odvede
+// ih u Postavke i redom istakne (spotlight) link/QR kod, upis trajanja
+// usluge i pauzu u danu, uz jednostavno objasnjenje svakog. Namjerno se
+// prikazuje SVAKI put (ne pamti "vidio sam"), mobile-first.
 export function OnboardingTour() {
-  const store = useAdminStore();
   const pathname = usePathname();
   const router = useRouter();
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
 
   useEffect(() => {
-    try {
-      const done = localStorage.getItem(storageKey(store.id));
-      if (!done) {
-        setActive(true);
-        if (pathname !== "/admin/postavke") {
-          router.push("/admin/postavke");
-        }
-      }
-    } catch {
-      // localStorage moze biti nedostupan (privatni mod) — vodic se tiho preskace.
+    if (pathname !== "/admin/postavke") {
+      router.push("/admin/postavke");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -64,11 +51,6 @@ export function OnboardingTour() {
   }, [active, stepIndex, pathname, measure]);
 
   function finish() {
-    try {
-      localStorage.setItem(storageKey(store.id), "1");
-    } catch {
-      // ignoriraj — najgore je da se vodic ponovno prikaze.
-    }
     setActive(false);
   }
 
