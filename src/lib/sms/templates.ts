@@ -55,13 +55,13 @@ export function buildSmsBody(kind: SmsKind, params: SmsTemplateParams): string {
 
   switch (kind) {
     case "CONFIRMATION":
-      return `Vasa rezervacija za ${params.plate} u ${store} je potvrdjena za ${date} u ${time}. Otkazivanje: ${url}`;
+      return `Rezervacija ${params.plate} u ${store} potvrdjena ${date} u ${time}. Otkazi: ${url}`;
     case "REMINDER":
-      return `Podsjetnik: sutra u ${time} imate termin za zamjenu guma (${store}). Otkazivanje: ${url}`;
+      return `Podsjetnik: sutra u ${time} termin za zamjenu guma (${store}). Otkazi: ${url}`;
     case "CANCELLATION":
       return `Vas termin ${date} u ${time} (${store}) je otkazan.`;
     case "RESCHEDULE":
-      return `Vas termin u ${store} je pomaknut na ${date} u ${time}. Otkazivanje: ${url}`;
+      return `Termin u ${store} pomaknut na ${date} u ${time}. Otkazi: ${url}`;
   }
 }
 
