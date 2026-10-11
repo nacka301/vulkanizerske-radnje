@@ -13,8 +13,8 @@ Vercel.
 
 ## Trenutni Supabase projekt
 
-Repo je povezan s cloud Supabase projektom **`vulkanizerske-radnje`**
-(ref `xwobgzzplievhlphjuox`, eu-central-1) — vidi "Zasto cloud, ne lokalni
+Repo je povezan s cloud Supabase projektom **`nacka298_vulkanizeri`**
+(ref `bckmjvnjalvjkojpqmmx`, eu-west-1) — vidi "Zasto cloud, ne lokalni
 Docker" ispod. Sve migracije iz `supabase/migrations/` su vec primijenjene
 na taj projekt, `sms-worker` Edge Function je deployana, `pg_cron` poslovi
 su aktivni.
@@ -26,8 +26,9 @@ cp .env.example .env.local
 
 Popuni `.env.local`:
 
-- `NEXT_PUBLIC_SUPABASE_URL=https://xwobgzzplievhlphjuox.supabase.co`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_6pynjolMFyrhpF9KfHF2tQ_efuB5oai`
+- `NEXT_PUBLIC_SUPABASE_URL=https://bckmjvnjalvjkojpqmmx.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=` — pokupi iz Supabase dashboarda
+  (Project Settings → API Keys → publishable)
 - `SUPABASE_SERVICE_ROLE_KEY=` — pokupi iz Supabase dashboarda
   (Project Settings → API Keys → service_role → "reveal"). MCP alati koji su
   koristeni za izgradnju ovog repoa namjerno ne izlazu taj kljuc.

@@ -398,3 +398,24 @@ Dokument bilježi odluke koje nisu eksplicitno propisane u specifikaciji
   client komponente mora imati `dynamic = "force-dynamic"` osim ako je
   vec dinamicka po drugoj osnovi (cita cookies/headers/searchParams),
   inace CSP nonce prekine JS bez ijedne vidljive greske u UI-ju.
+
+## Selidba baze na drugi Supabase account (2026-10-11)
+
+- Stari projekt `vulkanizerske-radnje` (ref `xwobgzzplievhlphjuox`) je
+  pauziran jer besplatni plan dopusta samo 2 aktivna projekta po accountu.
+  Baza je prebacena na novi projekt `nacka298_vulkanizeri` (ref
+  `bckmjvnjalvjkojpqmmx`, eu-west-1) u drugom Supabase accountu.
+- Podaci nisu preseljeni iz stare baze — u njoj su bili samo demo podaci.
+  Nova baza je izgradjena iz repoa: svih 20 migracija + `seed.sql`
+  (poslano preko Management API `/database/query` jer CLI iz korisnikovog
+  PowerShella nije mogao doseci api.supabase.com), `sms-worker` deployan
+  s `supabase functions deploy --project-ref`, demo admin i super admin
+  kreirani preko GoTrue admin API-ja, `app_settings` (app_base_url,
+  Infobip) upisan rucno, fake rezervacije seedane relativno na danasnji
+  datum.
+- `sms_worker_url` u migraciji `20260921110100_sms_worker_cron.sql` sada
+  pokazuje na novi projekt ref. **Pravilo ubuduce**: kod svake nove
+  selidbe projekta taj URL (i `app_settings.sms_worker_url`) se mora
+  promijeniti, inace pg_cron zove staru funkciju.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` i
+  `SUPABASE_SERVICE_ROLE_KEY` na Vercelu moraju pokazivati na novi projekt.

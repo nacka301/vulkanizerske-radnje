@@ -4,7 +4,7 @@
 -- postavljanje Edge Function secreta).
 
 insert into app_settings (key, value) values
-  ('sms_worker_url', 'https://xwobgzzplievhlphjuox.supabase.co/functions/v1/sms-worker')
+  ('sms_worker_url', 'https://bckmjvnjalvjkojpqmmx.supabase.co/functions/v1/sms-worker')
 on conflict (key) do nothing;
 
 select cron.schedule(
